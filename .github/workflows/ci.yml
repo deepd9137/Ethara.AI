@@ -46,6 +46,8 @@ jobs:
         run: uv run pytest
         env:
           DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/ttm
+          JWT_SECRET: ci-test-jwt-secret-not-used-in-production
+          JWT_REFRESH_SECRET: ci-test-jwt-refresh-secret-not-used-in-production
 
     services:
       postgres:
