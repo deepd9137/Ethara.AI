@@ -32,7 +32,7 @@ export function LoginPage() {
 
   return (
     <div className="bg-bg flex min-h-screen items-center justify-center px-4">
-      <div className="w-full max-w-sm">
+      <main className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <h1 className="text-body text-2xl font-semibold">Welcome back</h1>
           <p className="text-muted mt-1 text-sm">Sign in to your account</p>
@@ -62,11 +62,11 @@ export function LoginPage() {
 
         <p className="text-muted mt-4 text-center text-sm">
           Don&apos;t have an account?{" "}
-          <Link to="/signup" className="text-primary hover:underline">
+          <Link to="/signup" className="text-primary underline">
             Sign up
           </Link>
         </p>
-      </div>
+      </main>
     </div>
   );
 }
