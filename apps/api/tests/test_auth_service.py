@@ -7,6 +7,7 @@ don't inherit sys.settrace).
 
 import contextlib
 import uuid
+from collections.abc import AsyncGenerator
 from datetime import UTC, datetime, timedelta
 
 import pytest
@@ -23,7 +24,7 @@ def _email(prefix: str = "svc") -> str:
 
 
 @pytest.fixture
-async def db() -> AsyncSession:
+async def db() -> AsyncGenerator[AsyncSession, None]:
     async with AsyncSessionLocal() as session:
         yield session
         await session.rollback()
