@@ -1,0 +1,41 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(uv *)",
+      "Bash(pytest *)",
+      "Bash(ruff *)",
+      "Bash(black *)",
+      "Bash(mypy *)",
+      "Bash(alembic *)",
+      "Bash(pnpm *)",
+      "Bash(npm *)",
+      "Bash(node *)",
+      "Bash(git log *)",
+      "Bash(git diff *)",
+      "Bash(git status *)",
+      "Bash(git show *)",
+      "Bash(git branch *)",
+      "Bash(git stash *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git checkout *)",
+      "Bash(git switch *)",
+      "Bash(find *)",
+      "Bash(grep *)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(mkdir *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "Bash(rm *)",
+      "Bash(docker *)",
+      "Bash(which *)",
+      "Bash(echo *)",
+      "Bash(jq *)",
+      "Bash(nvm *)",
+      "Read",
+      "Edit",
+      "Write"
+    ]
+  }
+}
