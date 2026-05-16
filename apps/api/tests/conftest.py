@@ -4,19 +4,20 @@ Test configuration.
 - Rate limiter disabled so the 10/5min cap doesn't trigger during the full suite.
 """
 
+from collections.abc import Generator
 from unittest.mock import patch
 
 import pytest
 
 
 @pytest.fixture(scope="session")
-def event_loop_policy():  # type: ignore[return]
+def event_loop_policy() -> object:
     import asyncio
 
     return asyncio.DefaultEventLoopPolicy()
 
 
 @pytest.fixture(autouse=True)
-def disable_rate_limiting() -> None:  # type: ignore[return]
+def disable_rate_limiting() -> Generator[None, None, None]:
     with patch("app.core.limiter.limiter.enabled", False):
         yield
