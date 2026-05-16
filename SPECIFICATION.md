@@ -61,19 +61,19 @@ The **Team Task Manager** is a focused, opinionated tool for **project-scoped ta
 
 ### 1.2 Target Users
 
-| Persona | Role | Primary Goals |
-|---|---|---|
-| **Project Lead / Manager** | Admin | Create projects, set scope, invite contributors, monitor progress, generate status reports |
-| **Individual Contributor** | Member | See assigned tasks, update status, comment, log progress |
-| **Cross-functional Stakeholder** | Member (read-mostly) | Visibility into team progress without editing rights on others' work |
-| **Compliance / Operations** | Admin (audit) | Use ActivityLog to demonstrate governance |
+| Persona                          | Role                 | Primary Goals                                                                              |
+| -------------------------------- | -------------------- | ------------------------------------------------------------------------------------------ |
+| **Project Lead / Manager**       | Admin                | Create projects, set scope, invite contributors, monitor progress, generate status reports |
+| **Individual Contributor**       | Member               | See assigned tasks, update status, comment, log progress                                   |
+| **Cross-functional Stakeholder** | Member (read-mostly) | Visibility into team progress without editing rights on others' work                       |
+| **Compliance / Operations**      | Admin (audit)        | Use ActivityLog to demonstrate governance                                                  |
 
 ### 1.3 Collaboration Problems Solved
 
 - Replaces "Who owns this?" with **assignee + status visible on every task**.
 - Replaces "What changed?" with an immutable **ActivityLog**.
 - Replaces "Can they see this?" with **RBAC enforced at the API layer**, not the UI layer.
-- Replaces "Where do I even start?" with a **per-user dashboard** of *my open / overdue / due-soon* work.
+- Replaces "Where do I even start?" with a **per-user dashboard** of _my open / overdue / due-soon_ work.
 
 ### 1.4 Why RBAC Matters
 
@@ -94,14 +94,14 @@ Role-based access control is not a nice-to-have for a multi-tenant collaboration
 
 ### 1.6 Expected Scale (Year-1 Target)
 
-| Dimension | Target | Reasoning |
-|---|---|---|
-| Concurrent users | 500 | Suffices for SMB / mid-market teams |
-| Projects per tenant | 10,000 | Large agencies / enterprises |
-| Tasks per project | 50,000 | Hot upper bound; pagination + indexes required |
-| API p95 latency | < 200 ms | Industry-standard responsive UX |
-| Throughput | 200 req/s sustained | One Railway service vertically; horizontal if needed |
-| Storage growth | ~5 GB / year / 100-user tenant | PostgreSQL on Railway managed |
+| Dimension           | Target                         | Reasoning                                            |
+| ------------------- | ------------------------------ | ---------------------------------------------------- |
+| Concurrent users    | 500                            | Suffices for SMB / mid-market teams                  |
+| Projects per tenant | 10,000                         | Large agencies / enterprises                         |
+| Tasks per project   | 50,000                         | Hot upper bound; pagination + indexes required       |
+| API p95 latency     | < 200 ms                       | Industry-standard responsive UX                      |
+| Throughput          | 200 req/s sustained            | One Railway service vertically; horizontal if needed |
+| Storage growth      | ~5 GB / year / 100-user tenant | PostgreSQL on Railway managed                        |
 
 ### 1.7 Productivity Challenges Addressed
 
@@ -139,27 +139,27 @@ Role-based access control is not a nice-to-have for a multi-tenant collaboration
 
 ### 2.3 UX Principles
 
-| Principle | Manifestation |
-|---|---|
-| **Clarity over cleverness** | No hidden gestures; visible affordances |
-| **Optimistic UI** | Mutations feel instant via TanStack Query optimistic updates |
-| **Forgiving** | Confirm-destructive-actions, undo on soft-deletes |
-| **Keyboard-first** | All primary actions reachable via shortcuts (`c` create, `/` search, `g d` go to dashboard) |
-| **Empty states teach** | Every empty list explains what to do next |
-| **No spinners > 300 ms without skeletons** | Perceived performance |
+| Principle                                  | Manifestation                                                                               |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| **Clarity over cleverness**                | No hidden gestures; visible affordances                                                     |
+| **Optimistic UI**                          | Mutations feel instant via TanStack Query optimistic updates                                |
+| **Forgiving**                              | Confirm-destructive-actions, undo on soft-deletes                                           |
+| **Keyboard-first**                         | All primary actions reachable via shortcuts (`c` create, `/` search, `g d` go to dashboard) |
+| **Empty states teach**                     | Every empty list explains what to do next                                                   |
+| **No spinners > 300 ms without skeletons** | Perceived performance                                                                       |
 
 ### 2.4 Performance Goals
 
-| Metric | Target |
-|---|---|
-| API p50 latency | < 80 ms |
-| API p95 latency | < 200 ms |
-| API p99 latency | < 500 ms |
-| LCP (mobile) | < 2.5 s |
-| CLS | < 0.1 |
-| TBT | < 200 ms |
+| Metric                            | Target   |
+| --------------------------------- | -------- |
+| API p50 latency                   | < 80 ms  |
+| API p95 latency                   | < 200 ms |
+| API p99 latency                   | < 500 ms |
+| LCP (mobile)                      | < 2.5 s  |
+| CLS                               | < 0.1    |
+| TBT                               | < 200 ms |
 | Bundle size (initial JS, gzipped) | < 200 KB |
-| Lighthouse Performance | ≥ 90 |
+| Lighthouse Performance            | ≥ 90     |
 
 ### 2.5 Security Goals
 
@@ -195,6 +195,7 @@ Role-based access control is not a nice-to-have for a multi-tenant collaboration
 **Description.** Email + password authentication with JWT access tokens and rotating refresh tokens.
 
 **Business logic.**
+
 - Sign-up creates a `User` row; password is bcrypt-hashed with cost factor 12.
 - Login issues a short-lived **access token** (15 min) and a long-lived **refresh token** (14 days).
 - Refresh tokens are stored hashed in `refresh_tokens` table (`jti`, `user_id`, `family_id`, `expires_at`, `revoked_at`).
@@ -202,6 +203,7 @@ Role-based access control is not a nice-to-have for a multi-tenant collaboration
 - **Re-use detection**: if a previously-used refresh token is presented, the entire family is revoked (suspected theft).
 
 **User flow.**
+
 1. User signs up → automatically logged in.
 2. Access token kept **in memory** (Zustand store).
 3. Refresh token stored in **HttpOnly, Secure, SameSite=Strict cookie**.
@@ -209,6 +211,7 @@ Role-based access control is not a nice-to-have for a multi-tenant collaboration
 5. Logout → server revokes refresh token; client clears in-memory state.
 
 **Validation rules.**
+
 - Email: RFC 5322 syntax, max 254 chars, normalized lowercase.
 - Password: min 12 chars, must include letter + digit; max 128 chars.
 - Name: 1–80 chars, trimmed.
@@ -218,16 +221,19 @@ Role-based access control is not a nice-to-have for a multi-tenant collaboration
 **API behavior.** See [Section 10](#10-api-design).
 
 **Failure handling.**
+
 - Wrong password → generic `INVALID_CREDENTIALS` (no enumeration).
 - Locked account → `ACCOUNT_LOCKED` after 10 failed attempts in 15 minutes.
 - Expired refresh → `REFRESH_EXPIRED` → client redirects to `/login`.
 
 **Edge cases.**
+
 - Concurrent refresh requests from two tabs → race-safe via DB unique constraint on `(family_id, used_at IS NULL)`.
 - Clock skew → tokens validated with 30-second leeway.
 - User changes password → all refresh families revoked.
 
 **Security considerations.**
+
 - bcrypt rounds tunable via env var.
 - Constant-time comparison for credentials and tokens.
 - No password in logs (Pydantic `SecretStr`).
@@ -239,6 +245,7 @@ Role-based access control is not a nice-to-have for a multi-tenant collaboration
 **Description.** Authenticated users create, list, view, update, and soft-delete projects they own or belong to.
 
 **Business logic.**
+
 - The creator is automatically inserted into `project_members` with role `ADMIN`.
 - A project must have ≥ 1 Admin at all times; demoting/removing the last Admin fails.
 - Soft delete sets `deleted_at`; project becomes invisible to all but excluded from listings, including for the owner. Hard delete is reserved for backend cleanup jobs.
@@ -246,11 +253,13 @@ Role-based access control is not a nice-to-have for a multi-tenant collaboration
 **User flow.** Create → see in sidebar → open → invite members → create tasks.
 
 **Validation rules.**
+
 - Name: 2–80 chars, unique per `(owner_id, deleted_at IS NULL)`.
 - Description: max 2,000 chars, plaintext (no HTML).
 - Slug: auto-derived from name, lowercase, dash-separated.
 
 **Permissions.**
+
 - Create: any authenticated user.
 - Read: members only.
 - Update / Soft-delete: Admins only.
@@ -259,10 +268,12 @@ Role-based access control is not a nice-to-have for a multi-tenant collaboration
 **API behavior.** `POST /projects`, `GET /projects`, `GET /projects/{id}`, `PATCH /projects/{id}`, `DELETE /projects/{id}`.
 
 **Failure handling.**
+
 - Duplicate name → `409 PROJECT_NAME_TAKEN`.
 - Non-member access → `404` (not `403`, to avoid leaking existence).
 
 **Edge cases.**
+
 - User deactivated while owning projects → projects remain readable to other members; system role `ORPHANED` flag set.
 - Soft-deleted project restoration → admin-only, within 30 days, restores associations.
 
@@ -275,6 +286,7 @@ Role-based access control is not a nice-to-have for a multi-tenant collaboration
 **Description.** Admins invite existing users (by email) to a project as Admin or Member; manage roles; remove members.
 
 **Business logic.**
+
 - Invitation looks up the user by normalized email.
   - If found, immediately creates `project_members` row with `status='active'`.
   - If not found, creates a `pending_invitation` (MVP: out of scope — see post-MVP).
@@ -284,6 +296,7 @@ Role-based access control is not a nice-to-have for a multi-tenant collaboration
 **User flow.** Admin opens Members tab → enters email → selects role → submits → user appears in list with role badge.
 
 **Validation rules.**
+
 - Email format; cannot invite self; cannot invite an already-present member.
 - Role must be in `{ADMIN, MEMBER}`.
 
@@ -292,15 +305,17 @@ Role-based access control is not a nice-to-have for a multi-tenant collaboration
 **API behavior.** `POST /projects/{id}/members`, `GET /projects/{id}/members`, `PATCH /projects/{id}/members/{user_id}`, `DELETE /projects/{id}/members/{user_id}`.
 
 **Failure handling.**
+
 - Inviting non-existent user (MVP) → `404 USER_NOT_FOUND`.
 - Inviting duplicate member → `409 ALREADY_MEMBER`.
 - Demoting last Admin → `409 LAST_ADMIN`.
 
 **Edge cases.**
+
 - Mass invite with one invalid email → entire request rejected (atomic).
 - User removed from project while having an open task assignment → assignee nulled, ActivityLog entry written.
 
-**Security considerations.** Email enumeration mitigated by returning the same error for "user exists / does not exist" in the *signup* path, not membership (members are intentionally enumerable to Admins).
+**Security considerations.** Email enumeration mitigated by returning the same error for "user exists / does not exist" in the _signup_ path, not membership (members are intentionally enumerable to Admins).
 
 ---
 
@@ -309,6 +324,7 @@ Role-based access control is not a nice-to-have for a multi-tenant collaboration
 **Description.** Members create, read, update, and soft-delete tasks within projects they belong to.
 
 **Business logic.**
+
 - A Task belongs to exactly one Project.
 - Fields: `title`, `description`, `status`, `priority`, `assignee_id`, `due_date`, `completed_at`.
 - **Status FSM**: `todo → in_progress → in_review → done`. Transitions only along this DAG plus `done → in_review` (reopen). Arbitrary jumps are rejected.
@@ -318,12 +334,14 @@ Role-based access control is not a nice-to-have for a multi-tenant collaboration
 **User flow.** Open project → click "+ New Task" → fill form → save → task appears in list and on assignee's dashboard.
 
 **Validation rules.**
+
 - Title: 2–140 chars.
 - Description: max 10,000 chars.
 - Due date: must be ≥ today (allow today). Optional.
 - Priority: `low | medium | high | critical`. Default `medium`.
 
 **Permissions.**
+
 - Create: any project member.
 - Update title/desc/priority/due/assignee: Admins, or the task's creator, or the current assignee.
 - Update status: any project member.
@@ -332,10 +350,12 @@ Role-based access control is not a nice-to-have for a multi-tenant collaboration
 **API behavior.** `POST /projects/{id}/tasks`, `GET /projects/{id}/tasks?status=&assignee=&priority=&due_before=&q=&page=&size=&sort=`, `GET /tasks/{id}`, `PATCH /tasks/{id}`, `PATCH /tasks/{id}/status`, `DELETE /tasks/{id}`.
 
 **Failure handling.**
+
 - Invalid status transition → `422 INVALID_TASK_TRANSITION` with `allowed` list.
 - Assignee not a member → `422 ASSIGNEE_NOT_MEMBER`.
 
 **Edge cases.**
+
 - Assignee removed from project → on next read, frontend shows "Unassigned"; backend already nulled.
 - Concurrent edits → optimistic concurrency via `updated_at` `If-Unmodified-Since` semantics or `version` integer (MVP: `If-Match: <updated_at_iso>`).
 
@@ -348,6 +368,7 @@ Role-based access control is not a nice-to-have for a multi-tenant collaboration
 **Description.** Per-user aggregate view: open tasks, overdue, due-this-week, by-status counts, recent activity.
 
 **Business logic.**
+
 - All counts respect RBAC (only tasks in projects the user belongs to).
 - Aggregations performed via SQL `GROUP BY` (no per-task fetching in Python).
 - Optional Redis cache (60-second TTL) keyed by `user_id`.
@@ -357,6 +378,7 @@ Role-based access control is not a nice-to-have for a multi-tenant collaboration
 **API behavior.** `GET /dashboard/stats`, `GET /dashboard/my-tasks`, `GET /dashboard/recent-activity`.
 
 **Edge cases.**
+
 - New user with no projects → empty-state card "Create your first project".
 - User in many projects → cap recent-activity to 50 most-recent entries.
 
@@ -367,6 +389,7 @@ Role-based access control is not a nice-to-have for a multi-tenant collaboration
 **Description.** Immutable, append-only log of every meaningful mutation.
 
 **Business logic.**
+
 - A row is written in the **same DB transaction** as the mutation (no eventual consistency hole).
 - Schema: `id`, `actor_id`, `project_id`, `entity_type`, `entity_id`, `action`, `metadata JSONB`, `created_at`.
 - Actions: `PROJECT_CREATED`, `PROJECT_UPDATED`, `MEMBER_INVITED`, `MEMBER_REMOVED`, `MEMBER_ROLE_CHANGED`, `TASK_CREATED`, `TASK_UPDATED`, `TASK_STATUS_CHANGED`, `TASK_ASSIGNED`, `TASK_DELETED`.
@@ -398,35 +421,35 @@ Out of scope for MVP. Planned design:
 
 ### 4.1 Roles
 
-| Role | Scope | Description |
-|---|---|---|
-| **Admin** | Per-project | Creator or any user explicitly promoted. Manages members, edits project, deletes tasks. |
+| Role       | Scope       | Description                                                                               |
+| ---------- | ----------- | ----------------------------------------------------------------------------------------- |
+| **Admin**  | Per-project | Creator or any user explicitly promoted. Manages members, edits project, deletes tasks.   |
 | **Member** | Per-project | Default invited role. Creates and works tasks; cannot manage members or project metadata. |
 
 > **Note.** Roles are **project-scoped**, not global. A user may be Admin of Project A and Member of Project B simultaneously. There is no system-wide "super admin" role in the MVP.
 
 ### 4.2 Authorization Matrix
 
-| Action | Anonymous | Authenticated (non-member) | Member | Admin |
-|---|:---:|:---:|:---:|:---:|
-| Sign up | ✅ | — | — | — |
-| Login | ✅ | — | — | — |
-| Create project | ❌ | ✅ | ✅ | ✅ |
-| List own projects | ❌ | ✅ | ✅ | ✅ |
-| Read project | ❌ | ❌ (404) | ✅ | ✅ |
-| Update project | ❌ | ❌ | ❌ | ✅ |
-| Delete project (soft) | ❌ | ❌ | ❌ | ✅ |
-| List members | ❌ | ❌ | ✅ | ✅ |
-| Invite member | ❌ | ❌ | ❌ | ✅ |
-| Change member role | ❌ | ❌ | ❌ | ✅ |
-| Remove member | ❌ | ❌ | ❌ | ✅ |
-| Create task | ❌ | ❌ | ✅ | ✅ |
-| Read task | ❌ | ❌ | ✅ | ✅ |
-| Update task (own / assigned) | ❌ | ❌ | ✅ | ✅ |
-| Update task (others') | ❌ | ❌ | ❌ | ✅ |
-| Change task status | ❌ | ❌ | ✅ | ✅ |
-| Delete task (soft) | ❌ | ❌ | own only | ✅ |
-| Read activity log | ❌ | ❌ | ✅ | ✅ |
+| Action                       | Anonymous | Authenticated (non-member) |  Member  | Admin |
+| ---------------------------- | :-------: | :------------------------: | :------: | :---: |
+| Sign up                      |    ✅     |             —              |    —     |   —   |
+| Login                        |    ✅     |             —              |    —     |   —   |
+| Create project               |    ❌     |             ✅             |    ✅    |  ✅   |
+| List own projects            |    ❌     |             ✅             |    ✅    |  ✅   |
+| Read project                 |    ❌     |          ❌ (404)          |    ✅    |  ✅   |
+| Update project               |    ❌     |             ❌             |    ❌    |  ✅   |
+| Delete project (soft)        |    ❌     |             ❌             |    ❌    |  ✅   |
+| List members                 |    ❌     |             ❌             |    ✅    |  ✅   |
+| Invite member                |    ❌     |             ❌             |    ❌    |  ✅   |
+| Change member role           |    ❌     |             ❌             |    ❌    |  ✅   |
+| Remove member                |    ❌     |             ❌             |    ❌    |  ✅   |
+| Create task                  |    ❌     |             ❌             |    ✅    |  ✅   |
+| Read task                    |    ❌     |             ❌             |    ✅    |  ✅   |
+| Update task (own / assigned) |    ❌     |             ❌             |    ✅    |  ✅   |
+| Update task (others')        |    ❌     |             ❌             |    ❌    |  ✅   |
+| Change task status           |    ❌     |             ❌             |    ✅    |  ✅   |
+| Delete task (soft)           |    ❌     |             ❌             | own only |  ✅   |
+| Read activity log            |    ❌     |             ❌             |    ✅    |  ✅   |
 
 ### 4.3 Ownership Rules
 
@@ -493,6 +516,7 @@ sequenceDiagram
 ## 5. Functional Requirements
 
 ### Authentication
+
 - **FR-1** A visitor can sign up with email, name, and password.
 - **FR-2** A user can log in with email and password.
 - **FR-3** A logged-in user can refresh their access token via a rotating refresh token.
@@ -501,6 +525,7 @@ sequenceDiagram
 - **FR-6** A logged-in user can change their password (revokes all refresh families).
 
 ### Projects
+
 - **FR-7** An authenticated user can create a project.
 - **FR-8** A project creator is automatically assigned the Admin role.
 - **FR-9** A user can list projects they belong to.
@@ -511,6 +536,7 @@ sequenceDiagram
 - **FR-14** A non-member cannot determine whether a project exists.
 
 ### Members
+
 - **FR-15** An Admin can invite an existing user by email as Admin or Member.
 - **FR-16** Members can list project members and their roles.
 - **FR-17** An Admin can change a member's role.
@@ -519,6 +545,7 @@ sequenceDiagram
 - **FR-20** The owner cannot be removed without ownership transfer.
 
 ### Tasks
+
 - **FR-21** A member can create a task in a project.
 - **FR-22** Tasks have title, description, status, priority, assignee, due date.
 - **FR-23** Status transitions follow `todo → in_progress → in_review → done`, with `done → in_review` reopen.
@@ -531,16 +558,19 @@ sequenceDiagram
 - **FR-30** Concurrent edits use optimistic concurrency (`If-Match`).
 
 ### Dashboard
+
 - **FR-31** A logged-in user sees aggregate counts: open, overdue, due-this-week, by-status, by-priority.
 - **FR-32** A logged-in user sees their open tasks across all projects.
 - **FR-33** A logged-in user sees a recent-activity feed scoped to their projects.
 
 ### Audit
+
 - **FR-34** Every project/member/task mutation writes one ActivityLog row in the same transaction.
 - **FR-35** Members can read the activity log of their projects.
 - **FR-36** ActivityLog rows are immutable via the API.
 
 ### Cross-cutting
+
 - **FR-37** All list endpoints support cursor-or-offset pagination, sorting, and filtering.
 - **FR-38** All authenticated endpoints reject expired/invalid tokens.
 - **FR-39** All endpoints return standardized envelopes.
@@ -560,25 +590,25 @@ sequenceDiagram
 
 ## 6. Non-Functional Requirements
 
-| Category | Requirement | Target |
-|---|---|---|
-| **Scalability** | Stateless API; horizontal scale via Railway replicas | 4 replicas supported without sticky sessions |
-| **Performance** | API p95 latency | < 200 ms |
-| **Performance** | DB queries per request | ≤ 5 typical, ≤ 10 hard cap |
-| **Availability** | Monthly uptime | 99.9% (≤ 43 min downtime) |
-| **Reliability** | Graceful degradation on Redis outage | App functions without cache |
-| **Security** | OWASP Top 10 mitigations documented | All 10 addressed (Section 17) |
-| **Security** | Dependency scanning | Weekly `pip-audit` + `pnpm audit` |
-| **Accessibility** | WCAG 2.1 AA conformance | Verified with axe-core in CI |
-| **Mobile responsiveness** | Smallest supported viewport | 360 × 640 |
-| **Maintainability** | Cyclomatic complexity per function | < 10 |
-| **Maintainability** | Test coverage backend | ≥ 80% lines, ≥ 70% branches |
-| **Observability** | All requests have correlation IDs | 100% |
-| **Observability** | Structured JSON logs | All log lines |
-| **Error resilience** | Network failure → retry with backoff | TanStack Query default retry x3 |
-| **Latency targets** | TTFB | < 100 ms (cached endpoints) |
-| **Internationalization** | UTF-8 throughout | All endpoints, DB columns |
-| **Privacy** | PII (email, name) never logged | Verified via log scrubbing |
+| Category                  | Requirement                                          | Target                                       |
+| ------------------------- | ---------------------------------------------------- | -------------------------------------------- |
+| **Scalability**           | Stateless API; horizontal scale via Railway replicas | 4 replicas supported without sticky sessions |
+| **Performance**           | API p95 latency                                      | < 200 ms                                     |
+| **Performance**           | DB queries per request                               | ≤ 5 typical, ≤ 10 hard cap                   |
+| **Availability**          | Monthly uptime                                       | 99.9% (≤ 43 min downtime)                    |
+| **Reliability**           | Graceful degradation on Redis outage                 | App functions without cache                  |
+| **Security**              | OWASP Top 10 mitigations documented                  | All 10 addressed (Section 17)                |
+| **Security**              | Dependency scanning                                  | Weekly `pip-audit` + `pnpm audit`            |
+| **Accessibility**         | WCAG 2.1 AA conformance                              | Verified with axe-core in CI                 |
+| **Mobile responsiveness** | Smallest supported viewport                          | 360 × 640                                    |
+| **Maintainability**       | Cyclomatic complexity per function                   | < 10                                         |
+| **Maintainability**       | Test coverage backend                                | ≥ 80% lines, ≥ 70% branches                  |
+| **Observability**         | All requests have correlation IDs                    | 100%                                         |
+| **Observability**         | Structured JSON logs                                 | All log lines                                |
+| **Error resilience**      | Network failure → retry with backoff                 | TanStack Query default retry x3              |
+| **Latency targets**       | TTFB                                                 | < 100 ms (cached endpoints)                  |
+| **Internationalization**  | UTF-8 throughout                                     | All endpoints, DB columns                    |
+| **Privacy**               | PII (email, name) never logged                       | Verified via log scrubbing                   |
 
 ---
 
@@ -586,34 +616,34 @@ sequenceDiagram
 
 ### 7.1 Frontend
 
-| Tech | Why |
-|---|---|
-| **React 18+** | Mature ecosystem, concurrent rendering, hooks-first |
-| **Vite** | Sub-second cold start, esbuild-fast HMR, first-class TS support |
-| **TypeScript (strict)** | Catches contract drift at compile time; required for safe refactors |
-| **TailwindCSS** | Utility-first; zero CSS naming bikeshed; consistent design tokens |
-| **TanStack Query** | Server-state caching, mutations, dedupe, devtools — replaces 70% of Redux for typical apps |
-| **Zustand** | Tiny (≤ 1 KB), no boilerplate; ideal for auth state and ephemeral UI flags |
-| **React Router v6** | Nested routes, data loaders, type-safe path helpers |
-| **Axios** | Interceptor model for auth refresh + error normalization |
-| **React Hook Form** | Uncontrolled-by-default; minimal re-renders; pairs cleanly with Zod |
-| **Zod** | Single source of truth for form schemas; type inference into TS |
+| Tech                    | Why                                                                                        |
+| ----------------------- | ------------------------------------------------------------------------------------------ |
+| **React 18+**           | Mature ecosystem, concurrent rendering, hooks-first                                        |
+| **Vite**                | Sub-second cold start, esbuild-fast HMR, first-class TS support                            |
+| **TypeScript (strict)** | Catches contract drift at compile time; required for safe refactors                        |
+| **TailwindCSS**         | Utility-first; zero CSS naming bikeshed; consistent design tokens                          |
+| **TanStack Query**      | Server-state caching, mutations, dedupe, devtools — replaces 70% of Redux for typical apps |
+| **Zustand**             | Tiny (≤ 1 KB), no boilerplate; ideal for auth state and ephemeral UI flags                 |
+| **React Router v6**     | Nested routes, data loaders, type-safe path helpers                                        |
+| **Axios**               | Interceptor model for auth refresh + error normalization                                   |
+| **React Hook Form**     | Uncontrolled-by-default; minimal re-renders; pairs cleanly with Zod                        |
+| **Zod**                 | Single source of truth for form schemas; type inference into TS                            |
 
 ### 7.2 Backend
 
-| Tech | Why |
-|---|---|
-| **Python 3.12+** | Generics syntax, performance gains, `tomllib` stdlib |
-| **FastAPI** | ASGI, automatic OpenAPI, Pydantic-native, DI built-in |
-| **SQLAlchemy 2.0** | New `select()` API; full typing; async-first; mature |
-| **Alembic** | Battle-tested schema migrations |
-| **Pydantic v2** | 10× faster than v1; strict mode; serializers |
-| **asyncpg** | Fastest PostgreSQL driver for asyncio |
+| Tech               | Why                                                   |
+| ------------------ | ----------------------------------------------------- |
+| **Python 3.12+**   | Generics syntax, performance gains, `tomllib` stdlib  |
+| **FastAPI**        | ASGI, automatic OpenAPI, Pydantic-native, DI built-in |
+| **SQLAlchemy 2.0** | New `select()` API; full typing; async-first; mature  |
+| **Alembic**        | Battle-tested schema migrations                       |
+| **Pydantic v2**    | 10× faster than v1; strict mode; serializers          |
+| **asyncpg**        | Fastest PostgreSQL driver for asyncio                 |
 
 ### 7.3 Database
 
-| Tech | Why |
-|---|---|
+| Tech              | Why                                                                     |
+| ----------------- | ----------------------------------------------------------------------- |
 | **PostgreSQL 16** | JSONB, partial indexes, generated columns, row-level security if needed |
 
 ### 7.4 Auth
@@ -623,14 +653,14 @@ sequenceDiagram
 
 ### 7.5 Tooling
 
-| Tool | Role | Why |
-|---|---|---|
-| **uv** | Python deps + venv | Rust-fast resolver, lockfile, reproducible builds, replaces pip/poetry/virtualenv |
-| **pnpm** | Node deps | Content-addressed store; deterministic; saves disk |
-| **ruff** | Linter | 10–100× faster than flake8; covers isort + pyflakes + pylint subset |
-| **black** | Formatter | One canonical style; zero discussion |
-| **mypy --strict** | Type checking | Catches `None` bugs, signature drift |
-| **pytest + pytest-asyncio + httpx** | Tests | Async fixtures, real ASGI calls without socket |
+| Tool                                | Role               | Why                                                                               |
+| ----------------------------------- | ------------------ | --------------------------------------------------------------------------------- |
+| **uv**                              | Python deps + venv | Rust-fast resolver, lockfile, reproducible builds, replaces pip/poetry/virtualenv |
+| **pnpm**                            | Node deps          | Content-addressed store; deterministic; saves disk                                |
+| **ruff**                            | Linter             | 10–100× faster than flake8; covers isort + pyflakes + pylint subset               |
+| **black**                           | Formatter          | One canonical style; zero discussion                                              |
+| **mypy --strict**                   | Type checking      | Catches `None` bugs, signature drift                                              |
+| **pytest + pytest-asyncio + httpx** | Tests              | Async fixtures, real ASGI calls without socket                                    |
 
 ### 7.6 Deployment
 
@@ -915,29 +945,29 @@ CREATE INDEX idx_activity_actor           ON activity_logs (actor_id);
 
 ### 9.3 Indexing Strategy
 
-| Query pattern | Index |
-|---|---|
-| "My tasks across projects" | `idx_tasks_assignee_open` (partial) |
+| Query pattern                        | Index                                          |
+| ------------------------------------ | ---------------------------------------------- |
+| "My tasks across projects"           | `idx_tasks_assignee_open` (partial)            |
 | "Tasks in project, filter by status" | `idx_tasks_project_alive` + `idx_tasks_status` |
-| "Overdue tasks" | `idx_tasks_due_date` (partial: not done) |
-| "Project activity feed" | `idx_activity_project_created` |
-| "Refresh token lookup" | `refresh_tokens_hash_uq` |
-| "Is user a member?" | `project_members_unique_pair` |
+| "Overdue tasks"                      | `idx_tasks_due_date` (partial: not done)       |
+| "Project activity feed"              | `idx_activity_project_created`                 |
+| "Refresh token lookup"               | `refresh_tokens_hash_uq`                       |
+| "Is user a member?"                  | `project_members_unique_pair`                  |
 
 Partial indexes used aggressively to shrink hot indexes and skip soft-deleted rows.
 
 ### 9.4 Cascade Rules Summary
 
-| FK | On Delete | Why |
-|---|---|---|
-| `project_members.project_id → projects` | `CASCADE` | Membership meaningless without project |
-| `project_members.user_id → users` | `CASCADE` | User gone, membership gone |
-| `tasks.project_id → projects` | `RESTRICT` | Soft-delete projects, never hard |
-| `tasks.assignee_id → users` | `SET NULL` | Don't orphan; show "Unassigned" |
-| `tasks.creator_id → users` | `RESTRICT` | Audit anchor |
-| `refresh_tokens.user_id → users` | `CASCADE` | Tokens worthless after user deletion |
-| `activity_logs.actor_id → users` | `SET NULL` | Preserve audit history |
-| `activity_logs.project_id → projects` | `SET NULL` | Preserve audit history |
+| FK                                      | On Delete  | Why                                    |
+| --------------------------------------- | ---------- | -------------------------------------- |
+| `project_members.project_id → projects` | `CASCADE`  | Membership meaningless without project |
+| `project_members.user_id → users`       | `CASCADE`  | User gone, membership gone             |
+| `tasks.project_id → projects`           | `RESTRICT` | Soft-delete projects, never hard       |
+| `tasks.assignee_id → users`             | `SET NULL` | Don't orphan; show "Unassigned"        |
+| `tasks.creator_id → users`              | `RESTRICT` | Audit anchor                           |
+| `refresh_tokens.user_id → users`        | `CASCADE`  | Tokens worthless after user deletion   |
+| `activity_logs.actor_id → users`        | `SET NULL` | Preserve audit history                 |
+| `activity_logs.project_id → projects`   | `SET NULL` | Preserve audit history                 |
 
 ---
 
@@ -959,6 +989,7 @@ Partial indexes used aggressively to shrink hot indexes and skip soft-deleted ro
 ### 10.2 Standard Response Envelope
 
 **Success:**
+
 ```json
 {
   "success": true,
@@ -968,6 +999,7 @@ Partial indexes used aggressively to shrink hot indexes and skip soft-deleted ro
 ```
 
 **Error:**
+
 ```json
 {
   "success": false,
@@ -984,80 +1016,80 @@ Partial indexes used aggressively to shrink hot indexes and skip soft-deleted ro
 
 #### Auth
 
-| Method | Path | Auth | Description | Body | Success | Errors |
-|---|---|:---:|---|---|---|---|
-| POST | `/auth/signup` | — | Register | `{email, name, password}` | `201` user+tokens | `409 EMAIL_TAKEN`, `422` |
-| POST | `/auth/login` | — | Log in | `{email, password}` | `200` tokens | `401 INVALID_CREDENTIALS`, `423 ACCOUNT_LOCKED` |
-| POST | `/auth/refresh` | cookie | Rotate token | — | `200` new tokens | `401 REFRESH_EXPIRED`, `401 REFRESH_REUSED` |
-| POST | `/auth/logout` | ✅ | Revoke refresh | — | `204` | `401` |
-| GET  | `/auth/me` | ✅ | Current user | — | `200` user | `401` |
-| POST | `/auth/change-password` | ✅ | Change password | `{current, new}` | `204` | `401 BAD_CURRENT`, `422` |
+| Method | Path                    |  Auth  | Description     | Body                      | Success           | Errors                                          |
+| ------ | ----------------------- | :----: | --------------- | ------------------------- | ----------------- | ----------------------------------------------- |
+| POST   | `/auth/signup`          |   —    | Register        | `{email, name, password}` | `201` user+tokens | `409 EMAIL_TAKEN`, `422`                        |
+| POST   | `/auth/login`           |   —    | Log in          | `{email, password}`       | `200` tokens      | `401 INVALID_CREDENTIALS`, `423 ACCOUNT_LOCKED` |
+| POST   | `/auth/refresh`         | cookie | Rotate token    | —                         | `200` new tokens  | `401 REFRESH_EXPIRED`, `401 REFRESH_REUSED`     |
+| POST   | `/auth/logout`          |   ✅   | Revoke refresh  | —                         | `204`             | `401`                                           |
+| GET    | `/auth/me`              |   ✅   | Current user    | —                         | `200` user        | `401`                                           |
+| POST   | `/auth/change-password` |   ✅   | Change password | `{current, new}`          | `204`             | `401 BAD_CURRENT`, `422`                        |
 
 #### Projects
 
-| Method | Path | Auth | Role | Description |
-|---|---|:---:|:---:|---|
-| POST   | `/projects` | ✅ | any | Create |
-| GET    | `/projects?page=&size=&sort=&q=` | ✅ | member | List my projects |
-| GET    | `/projects/{id}` | ✅ | member | Read |
-| PATCH  | `/projects/{id}` | ✅ | admin | Update |
-| DELETE | `/projects/{id}` | ✅ | admin | Soft delete |
-| POST   | `/projects/{id}/transfer-owner` | ✅ | owner | Transfer ownership |
+| Method | Path                             | Auth |  Role  | Description        |
+| ------ | -------------------------------- | :--: | :----: | ------------------ |
+| POST   | `/projects`                      |  ✅  |  any   | Create             |
+| GET    | `/projects?page=&size=&sort=&q=` |  ✅  | member | List my projects   |
+| GET    | `/projects/{id}`                 |  ✅  | member | Read               |
+| PATCH  | `/projects/{id}`                 |  ✅  | admin  | Update             |
+| DELETE | `/projects/{id}`                 |  ✅  | admin  | Soft delete        |
+| POST   | `/projects/{id}/transfer-owner`  |  ✅  | owner  | Transfer ownership |
 
 #### Members
 
-| Method | Path | Auth | Role | Description |
-|---|---|:---:|:---:|---|
-| POST   | `/projects/{id}/members` | ✅ | admin | Invite |
-| GET    | `/projects/{id}/members` | ✅ | member | List |
-| PATCH  | `/projects/{id}/members/{user_id}` | ✅ | admin | Change role |
-| DELETE | `/projects/{id}/members/{user_id}` | ✅ | admin | Remove |
+| Method | Path                               | Auth |  Role  | Description |
+| ------ | ---------------------------------- | :--: | :----: | ----------- |
+| POST   | `/projects/{id}/members`           |  ✅  | admin  | Invite      |
+| GET    | `/projects/{id}/members`           |  ✅  | member | List        |
+| PATCH  | `/projects/{id}/members/{user_id}` |  ✅  | admin  | Change role |
+| DELETE | `/projects/{id}/members/{user_id}` |  ✅  | admin  | Remove      |
 
 #### Tasks
 
-| Method | Path | Auth | Role | Description |
-|---|---|:---:|:---:|---|
-| POST   | `/projects/{id}/tasks` | ✅ | member | Create |
-| GET    | `/projects/{id}/tasks?status=&assignee_id=&priority=&due_before=&q=&page=&size=&sort=` | ✅ | member | List in project |
-| GET    | `/tasks/{id}` | ✅ | member | Read |
-| PATCH  | `/tasks/{id}` | ✅ | member* | Update fields |
-| PATCH  | `/tasks/{id}/status` | ✅ | member | Status FSM transition |
-| DELETE | `/tasks/{id}` | ✅ | admin/creator | Soft delete |
+| Method | Path                                                                                   | Auth |     Role      | Description           |
+| ------ | -------------------------------------------------------------------------------------- | :--: | :-----------: | --------------------- |
+| POST   | `/projects/{id}/tasks`                                                                 |  ✅  |    member     | Create                |
+| GET    | `/projects/{id}/tasks?status=&assignee_id=&priority=&due_before=&q=&page=&size=&sort=` |  ✅  |    member     | List in project       |
+| GET    | `/tasks/{id}`                                                                          |  ✅  |    member     | Read                  |
+| PATCH  | `/tasks/{id}`                                                                          |  ✅  |   member\*    | Update fields         |
+| PATCH  | `/tasks/{id}/status`                                                                   |  ✅  |    member     | Status FSM transition |
+| DELETE | `/tasks/{id}`                                                                          |  ✅  | admin/creator | Soft delete           |
 
 \* Member must be creator or current assignee for non-status fields.
 
 #### Dashboard
 
-| Method | Path | Auth | Description |
-|---|---|:---:|---|
-| GET | `/dashboard/stats` | ✅ | Counts: open, overdue, by-status, by-priority |
-| GET | `/dashboard/my-tasks?status=&due_before=` | ✅ | Assigned-to-me across projects |
-| GET | `/dashboard/recent-activity?limit=50` | ✅ | Activity across my projects |
+| Method | Path                                      | Auth | Description                                   |
+| ------ | ----------------------------------------- | :--: | --------------------------------------------- |
+| GET    | `/dashboard/stats`                        |  ✅  | Counts: open, overdue, by-status, by-priority |
+| GET    | `/dashboard/my-tasks?status=&due_before=` |  ✅  | Assigned-to-me across projects                |
+| GET    | `/dashboard/recent-activity?limit=50`     |  ✅  | Activity across my projects                   |
 
 #### System
 
-| Method | Path | Auth | Description |
-|---|---|:---:|---|
-| GET | `/health` | — | Liveness + DB ping; returns `{status, db, version, commit}` |
-| GET | `/docs` | — | OpenAPI Swagger UI (non-prod only) |
-| GET | `/openapi.json` | — | OpenAPI 3.1 spec |
+| Method | Path            | Auth | Description                                                 |
+| ------ | --------------- | :--: | ----------------------------------------------------------- |
+| GET    | `/health`       |  —   | Liveness + DB ping; returns `{status, db, version, commit}` |
+| GET    | `/docs`         |  —   | OpenAPI Swagger UI (non-prod only)                          |
+| GET    | `/openapi.json` |  —   | OpenAPI 3.1 spec                                            |
 
 ### 10.4 Status Code Standards
 
-| Code | Use |
-|---|---|
-| `200 OK` | Successful read or update |
-| `201 Created` | Resource created |
-| `204 No Content` | Successful with no body (delete, logout) |
-| `400 Bad Request` | Malformed payload |
-| `401 Unauthorized` | Missing/invalid token |
-| `403 Forbidden` | Authenticated but role insufficient (membership confirmed) |
-| `404 Not Found` | Resource absent OR caller has no access |
-| `409 Conflict` | Unique violation, FSM violation, last-admin |
-| `422 Unprocessable Entity` | Field validation |
-| `423 Locked` | Account lockout |
-| `429 Too Many Requests` | Rate limit hit |
-| `500 Internal Server Error` | Unhandled; sentry-tracked |
+| Code                        | Use                                                        |
+| --------------------------- | ---------------------------------------------------------- |
+| `200 OK`                    | Successful read or update                                  |
+| `201 Created`               | Resource created                                           |
+| `204 No Content`            | Successful with no body (delete, logout)                   |
+| `400 Bad Request`           | Malformed payload                                          |
+| `401 Unauthorized`          | Missing/invalid token                                      |
+| `403 Forbidden`             | Authenticated but role insufficient (membership confirmed) |
+| `404 Not Found`             | Resource absent OR caller has no access                    |
+| `409 Conflict`              | Unique violation, FSM violation, last-admin                |
+| `422 Unprocessable Entity`  | Field validation                                           |
+| `423 Locked`                | Account lockout                                            |
+| `429 Too Many Requests`     | Rate limit hit                                             |
+| `500 Internal Server Error` | Unhandled; sentry-tracked                                  |
 
 ### 10.5 Error Code Catalog (excerpt)
 
@@ -1147,6 +1179,7 @@ def transition(task: Task, new: TaskStatus) -> None:
 ### 11.7 Overdue Calculation
 
 A task is **overdue** iff:
+
 - `due_date IS NOT NULL`
 - `due_date < CURRENT_DATE` (DB server's date)
 - `status <> 'done'`
@@ -1427,13 +1460,13 @@ apps/
 
 ### 13.3 State Management
 
-| State | Tool | Reason |
-|---|---|---|
-| Server data (projects, tasks, etc.) | TanStack Query | Cache, dedupe, mutation invalidation |
-| Auth (access token, user) | Zustand | Tiny, synchronous, persistent across components |
-| Ephemeral UI (modals, sidebar) | Zustand | Co-located with auth |
-| Form state | React Hook Form | Uncontrolled, performant |
-| URL state (filters, pagination) | React Router search params | Shareable links |
+| State                               | Tool                       | Reason                                          |
+| ----------------------------------- | -------------------------- | ----------------------------------------------- |
+| Server data (projects, tasks, etc.) | TanStack Query             | Cache, dedupe, mutation invalidation            |
+| Auth (access token, user)           | Zustand                    | Tiny, synchronous, persistent across components |
+| Ephemeral UI (modals, sidebar)      | Zustand                    | Co-located with auth                            |
+| Form state                          | React Hook Form            | Uncontrolled, performant                        |
+| URL state (filters, pagination)     | React Router search params | Shareable links                                 |
 
 ### 13.4 API Client
 
@@ -1460,7 +1493,10 @@ api.interceptors.response.use(undefined, async (err) => {
     err.config._retry = true;
     refreshing ??= refreshAccessToken().finally(() => (refreshing = null));
     const newToken = await refreshing.catch(() => null);
-    if (!newToken) { clearAuth(); throw err; }
+    if (!newToken) {
+      clearAuth();
+      throw err;
+    }
     err.config.headers.Authorization = `Bearer ${newToken}`;
     return api(err.config);
   }
@@ -1476,7 +1512,8 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
   const { user, isLoading } = useMe();
   const location = useLocation();
   if (isLoading) return <FullPageSkeleton />;
-  if (!user) return <Navigate to={`/login?next=${encodeURIComponent(location.pathname)}`} replace />;
+  if (!user)
+    return <Navigate to={`/login?next=${encodeURIComponent(location.pathname)}`} replace />;
   return <>{children}</>;
 }
 ```
@@ -1504,15 +1541,15 @@ Wrapped in `<Suspense fallback={<RouteSkeleton />}>` at the router boundary.
 
 ### 14.2 Typography
 
-| Token | Use |
-|---|---|
-| `text-xs` (12 px) | Captions, meta |
-| `text-sm` (14 px) | Body |
-| `text-base` (16 px) | Form inputs |
-| `text-lg` (18 px) | Section headers |
-| `text-2xl` (24 px) | Page titles |
-| `font-medium` | Default emphasis |
-| `font-semibold` | Headings |
+| Token               | Use              |
+| ------------------- | ---------------- |
+| `text-xs` (12 px)   | Captions, meta   |
+| `text-sm` (14 px)   | Body             |
+| `text-base` (16 px) | Form inputs      |
+| `text-lg` (18 px)   | Section headers  |
+| `text-2xl` (24 px)  | Page titles      |
+| `font-medium`       | Default emphasis |
+| `font-semibold`     | Headings         |
 
 System font stack: Inter → SF Pro → Segoe UI → Roboto → sans-serif.
 
@@ -1522,18 +1559,18 @@ Tailwind's 4-px scale, used in multiples of 4. Layout grids use `gap-4` / `gap-6
 
 ### 14.4 Colors
 
-| Token | Value (light) | Use |
-|---|---|---|
-| `bg` | `#FFFFFF` | App background |
-| `surface` | `#F8FAFC` | Cards |
-| `border` | `#E2E8F0` | Dividers |
-| `text` | `#0F172A` | Body |
-| `text-muted` | `#64748B` | Secondary |
-| `primary` | `#4F46E5` | CTAs |
-| `success` | `#16A34A` | Done states |
-| `warning` | `#D97706` | Overdue, in-review |
-| `danger` | `#DC2626` | Destructive |
-| `info` | `#0284C7` | Notices |
+| Token        | Value (light) | Use                |
+| ------------ | ------------- | ------------------ |
+| `bg`         | `#FFFFFF`     | App background     |
+| `surface`    | `#F8FAFC`     | Cards              |
+| `border`     | `#E2E8F0`     | Dividers           |
+| `text`       | `#0F172A`     | Body               |
+| `text-muted` | `#64748B`     | Secondary          |
+| `primary`    | `#4F46E5`     | CTAs               |
+| `success`    | `#16A34A`     | Done states        |
+| `warning`    | `#D97706`     | Overdue, in-review |
+| `danger`     | `#DC2626`     | Destructive        |
+| `info`       | `#0284C7`     | Notices            |
 
 Dark theme mirrors with WCAG-AA contrast.
 
@@ -1553,13 +1590,13 @@ Dark theme mirrors with WCAG-AA contrast.
 
 ### 14.7 State Patterns
 
-| State | Pattern |
-|---|---|
-| Loading | Skeleton matching final layout; never bare spinner > 300 ms |
-| Empty | Illustration + headline + primary CTA |
-| Error | Friendly message + request-id + retry button |
-| Disabled | `aria-disabled` + reduced opacity + cursor `not-allowed` |
-| Success | Toast top-right, auto-dismiss 4 s |
+| State    | Pattern                                                     |
+| -------- | ----------------------------------------------------------- |
+| Loading  | Skeleton matching final layout; never bare spinner > 300 ms |
+| Empty    | Illustration + headline + primary CTA                       |
+| Error    | Friendly message + request-id + retry button                |
+| Disabled | `aria-disabled` + reduced opacity + cursor `not-allowed`    |
+| Success  | Toast top-right, auto-dismiss 4 s                           |
 
 ### 14.8 Responsive Behavior
 
@@ -1574,19 +1611,19 @@ Dark theme mirrors with WCAG-AA contrast.
 
 ### 15.1 Centralized Rules
 
-| Field | Rule |
-|---|---|
-| Email | RFC 5322, max 254, lowercase |
-| Password | 12–128, ≥ 1 letter, ≥ 1 digit, not common-password (zxcvbn ≥ 3 in production) |
-| Name | 1–80, trimmed |
-| Project name | 2–80, unique per owner |
-| Project description | ≤ 2,000 |
-| Task title | 2–140 |
-| Task description | ≤ 10,000 |
-| Due date | ≥ today, ≤ today + 5 years |
-| Priority | `low | medium | high | critical` |
-| Status | `todo | in_progress | in_review | done` |
-| UUID params | strict v4 |
+| Field               | Rule                                                                          |
+| ------------------- | ----------------------------------------------------------------------------- | ----------- | --------- | --------- |
+| Email               | RFC 5322, max 254, lowercase                                                  |
+| Password            | 12–128, ≥ 1 letter, ≥ 1 digit, not common-password (zxcvbn ≥ 3 in production) |
+| Name                | 1–80, trimmed                                                                 |
+| Project name        | 2–80, unique per owner                                                        |
+| Project description | ≤ 2,000                                                                       |
+| Task title          | 2–140                                                                         |
+| Task description    | ≤ 10,000                                                                      |
+| Due date            | ≥ today, ≤ today + 5 years                                                    |
+| Priority            | `low                                                                          | medium      | high      | critical` |
+| Status              | `todo                                                                         | in_progress | in_review | done`     |
+| UUID params         | strict v4                                                                     |
 
 ### 15.2 Pydantic v2 Example
 
@@ -1624,9 +1661,15 @@ export const TaskCreateSchema = z.object({
   description: z.string().max(10_000).optional().default(""),
   priority: z.enum(["low", "medium", "high", "critical"]).default("medium"),
   assignee_id: z.string().uuid().nullable().optional(),
-  due_date: z.string().date().nullable().optional()
-    .refine((v) => !v || v >= new Date().toISOString().slice(0, 10),
-            "Due date cannot be in the past"),
+  due_date: z
+    .string()
+    .date()
+    .nullable()
+    .optional()
+    .refine(
+      (v) => !v || v >= new Date().toISOString().slice(0, 10),
+      "Due date cannot be in the past",
+    ),
 });
 export type TaskCreate = z.infer<typeof TaskCreateSchema>;
 ```
@@ -1715,18 +1758,18 @@ See [10.4](#104-status-code-standards).
 
 ### 17.1 OWASP Top-10 Mitigation Matrix
 
-| OWASP | Mitigation |
-|---|---|
-| A01 Broken Access Control | Server-side RBAC dependencies on every endpoint; 404 vs 403 to avoid enumeration |
-| A02 Cryptographic Failures | TLS at edge; bcrypt cost 12; JWT secrets from env; no MD5/SHA1 |
-| A03 Injection | SQLAlchemy parameterized queries only; Pydantic strict input parsing |
-| A04 Insecure Design | This document; threat-model checklist (Section 32) |
-| A05 Security Misconfiguration | Strict CORS allow-list; HSTS; `/docs` disabled in prod |
-| A06 Vulnerable Components | Weekly `pip-audit`, `pnpm audit`, Dependabot |
-| A07 Authentication Failures | Rate-limited login; lockout; refresh rotation + reuse detection |
-| A08 Software & Data Integrity | Signed commits encouraged; locked lockfiles; CI provenance |
-| A09 Logging & Monitoring | Structured JSON logs; correlation IDs; no PII in logs |
-| A10 SSRF | No URL fetching in MVP; allow-list when added |
+| OWASP                         | Mitigation                                                                       |
+| ----------------------------- | -------------------------------------------------------------------------------- |
+| A01 Broken Access Control     | Server-side RBAC dependencies on every endpoint; 404 vs 403 to avoid enumeration |
+| A02 Cryptographic Failures    | TLS at edge; bcrypt cost 12; JWT secrets from env; no MD5/SHA1                   |
+| A03 Injection                 | SQLAlchemy parameterized queries only; Pydantic strict input parsing             |
+| A04 Insecure Design           | This document; threat-model checklist (Section 32)                               |
+| A05 Security Misconfiguration | Strict CORS allow-list; HSTS; `/docs` disabled in prod                           |
+| A06 Vulnerable Components     | Weekly `pip-audit`, `pnpm audit`, Dependabot                                     |
+| A07 Authentication Failures   | Rate-limited login; lockout; refresh rotation + reuse detection                  |
+| A08 Software & Data Integrity | Signed commits encouraged; locked lockfiles; CI provenance                       |
+| A09 Logging & Monitoring      | Structured JSON logs; correlation IDs; no PII in logs                            |
+| A10 SSRF                      | No URL fetching in MVP; allow-list when added                                    |
 
 ### 17.2 JWT Handling
 
@@ -1904,12 +1947,12 @@ Railway health-check path: `/health`. Timeout 5 s. 3 failures → restart.
 
 ### 21.1 Services
 
-| Service | Build | Start | Health |
-|---|---|---|---|
-| `api` | `uv sync --no-dev && alembic upgrade head` | `uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 2` | `/health` |
-| `web` | `pnpm install --frozen-lockfile && pnpm build` | `pnpm preview --port $PORT --host` (or a static serve adapter) | `/` |
-| `postgres` | managed addon | — | provider |
-| `redis` (optional) | managed addon | — | provider |
+| Service            | Build                                          | Start                                                          | Health    |
+| ------------------ | ---------------------------------------------- | -------------------------------------------------------------- | --------- |
+| `api`              | `uv sync --no-dev && alembic upgrade head`     | `uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 2` | `/health` |
+| `web`              | `pnpm install --frozen-lockfile && pnpm build` | `pnpm preview --port $PORT --host` (or a static serve adapter) | `/`       |
+| `postgres`         | managed addon                                  | —                                                              | provider  |
+| `redis` (optional) | managed addon                                  | —                                                              | provider  |
 
 ### 21.2 railway.toml (api)
 
@@ -1977,35 +2020,35 @@ railway run uv run alembic upgrade head
 
 ### 22.1 Backend
 
-| Var | Type | Example | Description |
-|---|---|---|---|
-| `ENVIRONMENT` | enum | `production` | `local`, `test`, `staging`, `production` |
-| `APP_VERSION` | str | `1.0.0` | Surfaced in `/health` and logs |
-| `GIT_SHA` | str | `abc1234` | Set by build; logged & on `/health` |
-| `DATABASE_URL` | url | `postgresql+asyncpg://user:pass@host:5432/db` | Async driver required |
-| `DATABASE_POOL_SIZE` | int | `10` | SQLAlchemy pool |
-| `DATABASE_MAX_OVERFLOW` | int | `20` | |
-| `REDIS_URL` | url | `redis://...` | Optional |
-| `JWT_SECRET` | str | random 32+ bytes b64 | Access-token signing |
-| `JWT_REFRESH_SECRET` | str | random 32+ bytes b64 | Refresh-token signing |
-| `JWT_ACCESS_TTL_SECONDS` | int | `900` | 15 min |
-| `JWT_REFRESH_TTL_SECONDS` | int | `1209600` | 14 days |
-| `BCRYPT_ROUNDS` | int | `12` | |
-| `FRONTEND_URLS` | csv | `https://app.example.com` | CORS allow-list |
-| `RATE_LIMIT_AUTH_PER_5MIN` | int | `10` | |
-| `RATE_LIMIT_USER_PER_MIN` | int | `120` | |
-| `SENTRY_DSN` | str | `https://...` | Optional |
-| `LOG_LEVEL` | enum | `INFO` | |
-| `DOCS_ENABLED` | bool | `false` | Disable `/docs` in prod |
+| Var                        | Type | Example                                       | Description                              |
+| -------------------------- | ---- | --------------------------------------------- | ---------------------------------------- |
+| `ENVIRONMENT`              | enum | `production`                                  | `local`, `test`, `staging`, `production` |
+| `APP_VERSION`              | str  | `1.0.0`                                       | Surfaced in `/health` and logs           |
+| `GIT_SHA`                  | str  | `abc1234`                                     | Set by build; logged & on `/health`      |
+| `DATABASE_URL`             | url  | `postgresql+asyncpg://user:pass@host:5432/db` | Async driver required                    |
+| `DATABASE_POOL_SIZE`       | int  | `10`                                          | SQLAlchemy pool                          |
+| `DATABASE_MAX_OVERFLOW`    | int  | `20`                                          |                                          |
+| `REDIS_URL`                | url  | `redis://...`                                 | Optional                                 |
+| `JWT_SECRET`               | str  | random 32+ bytes b64                          | Access-token signing                     |
+| `JWT_REFRESH_SECRET`       | str  | random 32+ bytes b64                          | Refresh-token signing                    |
+| `JWT_ACCESS_TTL_SECONDS`   | int  | `900`                                         | 15 min                                   |
+| `JWT_REFRESH_TTL_SECONDS`  | int  | `1209600`                                     | 14 days                                  |
+| `BCRYPT_ROUNDS`            | int  | `12`                                          |                                          |
+| `FRONTEND_URLS`            | csv  | `https://app.example.com`                     | CORS allow-list                          |
+| `RATE_LIMIT_AUTH_PER_5MIN` | int  | `10`                                          |                                          |
+| `RATE_LIMIT_USER_PER_MIN`  | int  | `120`                                         |                                          |
+| `SENTRY_DSN`               | str  | `https://...`                                 | Optional                                 |
+| `LOG_LEVEL`                | enum | `INFO`                                        |                                          |
+| `DOCS_ENABLED`             | bool | `false`                                       | Disable `/docs` in prod                  |
 
 ### 22.2 Frontend
 
-| Var | Example | Description |
-|---|---|---|
-| `VITE_API_BASE_URL` | `https://api.example.com/v1` | API base |
-| `VITE_SENTRY_DSN` | `https://...` | Optional |
-| `VITE_ENVIRONMENT` | `production` | |
-| `VITE_COMMIT_SHA` | `abc1234` | Surfaced in footer / error UI |
+| Var                 | Example                      | Description                   |
+| ------------------- | ---------------------------- | ----------------------------- |
+| `VITE_API_BASE_URL` | `https://api.example.com/v1` | API base                      |
+| `VITE_SENTRY_DSN`   | `https://...`                | Optional                      |
+| `VITE_ENVIRONMENT`  | `production`                 |                               |
+| `VITE_COMMIT_SHA`   | `abc1234`                    | Surfaced in footer / error UI |
 
 ### 22.3 `.env.example` (backend excerpt)
 
@@ -2048,6 +2091,7 @@ DOCS_ENABLED=true
 Types: `feat`, `fix`, `chore`, `refactor`, `docs`, `test`, `perf`, `build`, `ci`.
 
 Examples:
+
 ```bash
 feat(auth): implement JWT login flow
 fix(tasks): validate assignee is project member
@@ -2188,82 +2232,92 @@ make migration name=…   # generate new migration
 
 ## 26. Edge Cases & Critical Rules
 
-| # | Edge case | Strategy |
-|---|---|---|
-| 1 | **Duplicate invitations** | Unique constraint on `(project_id, user_id)`; service returns `409 ALREADY_MEMBER` |
-| 2 | **Expired JWT** | Axios 401 interceptor calls `/auth/refresh` once; if refresh fails → redirect login |
-| 3 | **Reused refresh token** | Revoke entire family; force re-login; security log entry |
-| 4 | **Concurrent task edits** | `If-Match: <updated_at>` header; mismatch → `412 PRECONDITION_FAILED`; UI prompts merge |
-| 5 | **Unauthorized access to project** | Return `404 PROJECT_NOT_FOUND` (no enumeration) |
-| 6 | **Role escalation attempt** | RBAC dependency rejects with `403`; logged |
-| 7 | **Network failures (frontend)** | TanStack Query retry x3 on GET; mutations surface error toast with Retry |
-| 8 | **Lost DB connection** | `pool_pre_ping=True` + 5xx returned; client retries idempotent GETs |
-| 9 | **Invalid task transition** | FSM check returns `422` with `allowed` list |
-| 10 | **Task assigned to removed member** | FK `ON DELETE SET NULL` + removal service nulls assignee; UI shows "Unassigned" |
-| 11 | **Empty dashboard** | Empty-state copy + CTA "Create your first project" |
-| 12 | **Partial failure mid-transaction** | One transaction per request; full rollback; activity log included |
-| 13 | **Failed migration on deploy** | Migration step exits non-zero; deploy halts; previous version remains live |
-| 14 | **Last admin demotion** | Service checks count; rejects with `409 LAST_ADMIN` |
-| 15 | **Self-removal of owner** | Rejected `409 CANNOT_REMOVE_OWNER`; user must transfer first |
-| 16 | **Soft-deleted user lookup in invites** | Query filters `deleted_at IS NULL`; returns `404 USER_NOT_FOUND` |
-| 17 | **Timezone confusion** | All times UTC at DB and API; UI converts on display |
-| 18 | **DST-affected due dates** | `due_date` stored as `DATE` (no time component) — no DST issues |
-| 19 | **Race in refresh rotation** | DB transaction + unique constraint on active jti per family |
-| 20 | **Long-running task list query** | Server-side pagination; hard cap `size=100` |
-| 21 | **Browser back after logout** | Sensitive pages re-check `/auth/me`; render-gate on user presence |
-| 22 | **API version mismatch** | `/v1` prefix; new major version goes to `/v2`; old never deleted within deprecation window |
-| 23 | **Cookie blocked (Safari 3rd-party)** | Hosted on first-party domain; `SameSite=Strict` requires same-site setup |
-| 24 | **Rate-limit lockout for legit user** | Per-user not per-IP for authenticated; documented `Retry-After` |
+| #   | Edge case                               | Strategy                                                                                   |
+| --- | --------------------------------------- | ------------------------------------------------------------------------------------------ |
+| 1   | **Duplicate invitations**               | Unique constraint on `(project_id, user_id)`; service returns `409 ALREADY_MEMBER`         |
+| 2   | **Expired JWT**                         | Axios 401 interceptor calls `/auth/refresh` once; if refresh fails → redirect login        |
+| 3   | **Reused refresh token**                | Revoke entire family; force re-login; security log entry                                   |
+| 4   | **Concurrent task edits**               | `If-Match: <updated_at>` header; mismatch → `412 PRECONDITION_FAILED`; UI prompts merge    |
+| 5   | **Unauthorized access to project**      | Return `404 PROJECT_NOT_FOUND` (no enumeration)                                            |
+| 6   | **Role escalation attempt**             | RBAC dependency rejects with `403`; logged                                                 |
+| 7   | **Network failures (frontend)**         | TanStack Query retry x3 on GET; mutations surface error toast with Retry                   |
+| 8   | **Lost DB connection**                  | `pool_pre_ping=True` + 5xx returned; client retries idempotent GETs                        |
+| 9   | **Invalid task transition**             | FSM check returns `422` with `allowed` list                                                |
+| 10  | **Task assigned to removed member**     | FK `ON DELETE SET NULL` + removal service nulls assignee; UI shows "Unassigned"            |
+| 11  | **Empty dashboard**                     | Empty-state copy + CTA "Create your first project"                                         |
+| 12  | **Partial failure mid-transaction**     | One transaction per request; full rollback; activity log included                          |
+| 13  | **Failed migration on deploy**          | Migration step exits non-zero; deploy halts; previous version remains live                 |
+| 14  | **Last admin demotion**                 | Service checks count; rejects with `409 LAST_ADMIN`                                        |
+| 15  | **Self-removal of owner**               | Rejected `409 CANNOT_REMOVE_OWNER`; user must transfer first                               |
+| 16  | **Soft-deleted user lookup in invites** | Query filters `deleted_at IS NULL`; returns `404 USER_NOT_FOUND`                           |
+| 17  | **Timezone confusion**                  | All times UTC at DB and API; UI converts on display                                        |
+| 18  | **DST-affected due dates**              | `due_date` stored as `DATE` (no time component) — no DST issues                            |
+| 19  | **Race in refresh rotation**            | DB transaction + unique constraint on active jti per family                                |
+| 20  | **Long-running task list query**        | Server-side pagination; hard cap `size=100`                                                |
+| 21  | **Browser back after logout**           | Sensitive pages re-check `/auth/me`; render-gate on user presence                          |
+| 22  | **API version mismatch**                | `/v1` prefix; new major version goes to `/v2`; old never deleted within deprecation window |
+| 23  | **Cookie blocked (Safari 3rd-party)**   | Hosted on first-party domain; `SameSite=Strict` requires same-site setup                   |
+| 24  | **Rate-limit lockout for legit user**   | Per-user not per-IP for authenticated; documented `Retry-After`                            |
 
 ---
 
 ## 27. Acceptance Criteria
 
 ### Authentication
+
 - User can sign up, log in, view profile, log out.
 - Wrong password is indistinguishable from unknown email.
 - Access token expires in 15 min; refresh auto-renews seamlessly.
 - 10 failed login attempts → lockout for 15 min.
 
 ### Projects
+
 - Authenticated user creates project; appears in list immediately.
 - Non-member cannot read project (returns `404`).
 - Admin can edit/soft-delete; Member cannot.
 - Soft-deleted project disappears from lists.
 
 ### Tasks
+
 - Member creates a task; assigning to a non-member fails with `422`.
 - Status transitions enforce FSM.
 - Filtering, sorting, pagination work on list endpoints.
 
 ### Dashboard
+
 - Counts match the underlying tasks visible to the user.
 - Overdue equals: not done AND `due_date < today`.
 - Empty state shown when there are zero projects.
 
 ### Deployment
+
 - Single push to `main` triggers Railway deploy.
 - Migrations run before app start; failed migration halts deploy.
 - `/health` returns 200 within 5 s.
 
 ### Security
+
 - All authenticated endpoints reject missing/expired tokens.
 - Refresh-token reuse triggers family revocation.
 - CORS allow-list rejects unknown origins.
 
 ### Mobile Responsiveness
+
 - Layout usable on 360 px without horizontal scroll.
 - Touch targets ≥ 44 × 44.
 
 ### Error Handling
+
 - All errors conform to envelope shape.
 - All errors include `request_id`.
 
 ### Logging
+
 - Every request emits one structured line with `request_id`, `user_id`, `status`, `latency_ms`.
 - No PII in logs (verified by grep on synthetic test).
 
 ### Validation
+
 - Both ends enforce identical rules; backend never trusts frontend.
 
 ---
@@ -2276,20 +2330,25 @@ make migration name=…   # generate new migration
 > Production-grade full-stack task management with project-scoped RBAC.
 
 ## Demo
+
 [Live](https://...) · Demo user: `demo@example.com` / `DemoPass123!`
 
 ## Stack
+
 FastAPI · SQLAlchemy 2.0 · PostgreSQL · React · Vite · TypeScript · TailwindCSS · TanStack Query
 
 ## Architecture
+
 See [SPECIFICATION.md](./SPECIFICATION.md) §8.
 
 ## Screenshots
-| Dashboard | Project | Task |
-|-|-|-|
+
+| Dashboard                   | Project                   | Task                   |
+| --------------------------- | ------------------------- | ---------------------- |
 | ![](docs/img/dashboard.png) | ![](docs/img/project.png) | ![](docs/img/task.png) |
 
 ## Local Setup
+
 1. `git clone … && cd team-task-manager`
 2. `cp apps/api/.env.example apps/api/.env`
 3. `cp apps/web/.env.example apps/web/.env`
@@ -2299,21 +2358,27 @@ See [SPECIFICATION.md](./SPECIFICATION.md) §8.
 7. `make dev` → http://localhost:5173
 
 ## Environment Variables
+
 See SPECIFICATION.md §22.
 
 ## API
+
 OpenAPI: http://localhost:8000/docs · Spec: [openapi.json](./apps/api/openapi.json)
 
 ## Testing
+
 `make test` — runs backend + frontend + e2e.
 
 ## Deployment
+
 Railway: see SPECIFICATION.md §21.
 
 ## Contributing
+
 See `CONTRIBUTING.md` — branch naming, conventional commits, PR template.
 
 ## License
+
 MIT
 ```
 
@@ -2322,6 +2387,7 @@ MIT
 ## 29. Development Phases
 
 ### Phase 1 — Repository Setup
+
 - **Deliverables**: monorepo (`apps/api`, `apps/web`), root `Makefile`, `.editorconfig`, `.gitignore`, root `README`, `docker-compose.yml` for Postgres, pre-commit config, CI skeleton.
 - **Definition of done**: `make bootstrap` succeeds on a clean clone; CI green on a no-op PR.
 - **Estimate**: 6–8 h.
@@ -2329,6 +2395,7 @@ MIT
 - **Risks**: monorepo tooling decisions (npm workspaces vs pnpm filter).
 
 ### Phase 2 — Backend Foundation
+
 - **Deliverables**: FastAPI app factory, settings, structlog, request-id middleware, exception handlers, SQLAlchemy 2.0 async engine, Alembic init, base model with timestamps + UUID, `/health` endpoint, pytest scaffolding.
 - **Definition of done**: `/health` returns 200; first Alembic revision created and applied; `pytest` runs and passes.
 - **Estimate**: 8–10 h.
@@ -2336,6 +2403,7 @@ MIT
 - **Risks**: async session/transaction patterns.
 
 ### Phase 3 — Authentication
+
 - **Deliverables**: `User`, `RefreshToken` models; signup/login/refresh/logout endpoints; bcrypt hashing; JWT issuance with rotation; rate limiting on `/auth/*`; tests covering golden + reuse-detection paths.
 - **Definition of done**: full auth flow + reuse-detection verified; coverage on `auth_service` ≥ 90%.
 - **Estimate**: 12–16 h.
@@ -2343,6 +2411,7 @@ MIT
 - **Risks**: refresh-rotation correctness; cookie SameSite cross-browser.
 
 ### Phase 4 — Project & Member Module
+
 - **Deliverables**: `Project`, `ProjectMember` models; CRUD endpoints; RBAC dependencies; invitation flow (existing users); soft delete; ActivityLog model + writes.
 - **Definition of done**: matrix of (role × action) covered by integration tests; last-admin/owner rules enforced.
 - **Estimate**: 12–14 h.
@@ -2350,6 +2419,7 @@ MIT
 - **Risks**: RBAC dependency composition; 404-vs-403 discipline.
 
 ### Phase 5 — Task Module
+
 - **Deliverables**: `Task` model; CRUD + status patch endpoints; FSM enforcement; filter/sort/paginate; activity logging for every mutation; assignee validation.
 - **Definition of done**: FSM exhaustive tests; pagination + filter contract tested.
 - **Estimate**: 12–14 h.
@@ -2357,6 +2427,7 @@ MIT
 - **Risks**: optimistic-concurrency design and adoption.
 
 ### Phase 6 — Frontend Foundation
+
 - **Deliverables**: Vite + React + TS scaffold; Tailwind; React Router; Axios client + auth interceptor; Zustand auth slice; TanStack Query setup; design-system primitives (Button, Input, Card, Toast); ProtectedRoute; Auth pages (Signup, Login).
 - **Definition of done**: golden auth flow works end-to-end against local backend; lint + typecheck green.
 - **Estimate**: 14–18 h.
@@ -2364,6 +2435,7 @@ MIT
 - **Risks**: axios refresh-token race; cookie behavior in dev across ports.
 
 ### Phase 7 — Projects, Tasks, Dashboard UI
+
 - **Deliverables**: Project list/detail; Member management UI; Task list/board/detail; Task create/edit forms; Dashboard with stat cards + my-tasks + recent-activity; empty/error/loading states everywhere.
 - **Definition of done**: Lighthouse Performance ≥ 90 on Projects page; axe-core clean.
 - **Estimate**: 20–24 h.
@@ -2371,6 +2443,7 @@ MIT
 - **Risks**: scope creep on board UX.
 
 ### Phase 8 — Testing & QA
+
 - **Deliverables**: ≥ 80% backend coverage; component tests for critical UI; Playwright covering signup → project → invite → task → done.
 - **Definition of done**: coverage gates in CI; nightly E2E green.
 - **Estimate**: 10–12 h.
@@ -2378,6 +2451,7 @@ MIT
 - **Risks**: flaky E2E; mitigate via stable test data + waitFor patterns.
 
 ### Phase 9 — Deployment & Polish
+
 - **Deliverables**: Railway api + web services; managed Postgres; env vars; sentry; production checklist (Section 32) passing; README screenshots; demo seed script.
 - **Definition of done**: live URL; production checklist 100% checked; rollback rehearsed.
 - **Estimate**: 8–10 h.
@@ -2591,19 +2665,20 @@ def run_migrations_online():
 
 ### 31.4 Standards Summary
 
-| Standard | Tool | Enforcement |
-|---|---|---|
-| Formatting | `black` | pre-commit + CI |
-| Linting | `ruff` | pre-commit + CI |
-| Typing | `mypy --strict` | CI |
-| Testing | `pytest` + coverage gate | CI |
-| Dependency hygiene | `uv` lockfile + `pip-audit` | CI weekly |
+| Standard           | Tool                        | Enforcement     |
+| ------------------ | --------------------------- | --------------- |
+| Formatting         | `black`                     | pre-commit + CI |
+| Linting            | `ruff`                      | pre-commit + CI |
+| Typing             | `mypy --strict`             | CI              |
+| Testing            | `pytest` + coverage gate    | CI              |
+| Dependency hygiene | `uv` lockfile + `pip-audit` | CI weekly       |
 
 ---
 
 ## 32. Production Checklist
 
 ### Security
+
 - [ ] All secrets via env vars; none committed.
 - [ ] JWT secrets ≥ 32 random bytes.
 - [ ] bcrypt rounds = 12 (or higher if benchmarked).
@@ -2616,52 +2691,61 @@ def run_migrations_online():
 - [ ] Refresh-token rotation + reuse detection verified.
 
 ### Logging
+
 - [ ] JSON logs in production.
 - [ ] Every request has `request_id`.
 - [ ] No PII (email, password, token) in any log line — verified via test.
 - [ ] Sentry capturing both ends.
 
 ### Environment Validation
+
 - [ ] All required env vars present (pydantic-settings validates at boot).
 - [ ] `ENVIRONMENT=production`.
 - [ ] `FRONTEND_URLS` matches deployed origin.
 - [ ] `DATABASE_URL` uses `+asyncpg` driver.
 
 ### DB Migrations
+
 - [ ] `alembic upgrade head` runs cleanly on a fresh DB.
 - [ ] Migration runs before app start in deploy step.
 - [ ] Failed migration halts deploy (verified once intentionally).
 - [ ] Backups configured (Railway PG daily snapshots).
 
 ### Mobile Responsiveness
+
 - [ ] Pages usable at 360 × 640 without horizontal scroll.
 - [ ] Touch targets ≥ 44 × 44.
 - [ ] Tested on real iOS Safari and Android Chrome.
 
 ### Railway Deployment
+
 - [ ] `api` and `web` services deploy from `main`.
 - [ ] Health check path `/health`; healthy within 5 s.
 - [ ] Rollback procedure documented and rehearsed.
 - [ ] Custom domain + TLS verified.
 
 ### API Validation
+
 - [ ] OpenAPI generated and committed.
 - [ ] Every endpoint has `response_model`.
 - [ ] All errors conform to envelope schema.
 - [ ] Pagination caps enforced (size ≤ 100).
 
 ### Lighthouse / Web Quality
+
 - [ ] Performance ≥ 90.
 - [ ] Accessibility ≥ 95 (axe-core no critical).
 - [ ] Best Practices ≥ 90.
 - [ ] SEO ≥ 80 (basic meta tags).
 
 ### Error Handling
+
 - [ ] Frontend ErrorBoundary surfaces request-id.
 - [ ] 4xx never logged at ERROR level.
 - [ ] 5xx triggers Sentry alert.
 
 ### Health & Observability
+
 - [ ] `/health` returns DB status.
 - [ ] Railway metrics dashboards reviewed.
 - [ ] Alerting policy: 5xx rate > 1% for 5 min → page.

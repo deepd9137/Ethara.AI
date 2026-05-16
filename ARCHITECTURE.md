@@ -54,13 +54,13 @@ This document is the **operating manual** for building, shipping, and maintainin
 
 Five operating principles drive every decision in this document:
 
-| Principle | What it means in practice |
-|---|---|
-| **Production-first** | Every feature is built behind real validation, real auth, real logging from day 1. No "we'll harden it later". |
-| **API-first contracts** | OpenAPI is the single source of truth. Frontend writes against the spec, not the implementation. |
-| **Vertical slices** | Each phase ships an end-to-end thin slice (DB → API → UI). Avoid horizontal layers built in isolation. |
-| **Tight feedback loops** | Pre-commit hooks + CI < 5 min + fast tests. The build tells the truth in seconds, not days. |
-| **Trunk-based, small commits** | `main` is always deployable. Branches live hours, not days. Each commit is reversible. |
+| Principle                      | What it means in practice                                                                                      |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| **Production-first**           | Every feature is built behind real validation, real auth, real logging from day 1. No "we'll harden it later". |
+| **API-first contracts**        | OpenAPI is the single source of truth. Frontend writes against the spec, not the implementation.               |
+| **Vertical slices**            | Each phase ships an end-to-end thin slice (DB → API → UI). Avoid horizontal layers built in isolation.         |
+| **Tight feedback loops**       | Pre-commit hooks + CI < 5 min + fast tests. The build tells the truth in seconds, not days.                    |
+| **Trunk-based, small commits** | `main` is always deployable. Branches live hours, not days. Each commit is reversible.                         |
 
 ### 1.2 MVP Strategy
 
@@ -85,17 +85,20 @@ Five operating principles drive every decision in this document:
 ### 1.5 Clean Architecture Philosophy
 
 Backend:
+
 ```
 HTTP (FastAPI router)  ──►  Service (business rules)  ──►  Repository (DB I/O)  ──►  ORM
 ```
 
 Hard rules:
+
 - **Routers** validate input shape and authorization; they do **not** contain business logic.
 - **Services** own business rules, FSMs, cross-entity invariants.
 - **Repositories** own SQL/ORM; they return models or DTOs, never raw rows.
 - **No raw SQL** outside repositories.
 
 Frontend:
+
 ```
 Page  ──►  Container/hook  ──►  API function  ──►  Axios client
               │
@@ -103,6 +106,7 @@ Page  ──►  Container/hook  ──►  API function  ──►  Axios clien
 ```
 
 Hard rules:
+
 - Presentational components take props, render JSX, no fetching.
 - Hooks own server state via TanStack Query.
 - Forms: Hook Form + Zod resolver, period.
@@ -293,30 +297,30 @@ Ethara.AI/
 
 ### 3.2 Why Each Folder
 
-| Path | Purpose | CI watches? |
-|---|---|---|
-| `apps/api` | Self-contained backend; can deploy independently | `paths: apps/api/**` |
-| `apps/web` | Self-contained frontend; can deploy independently | `paths: apps/web/**` |
-| `packages/shared-types` | Optional TS types generated from OpenAPI | yes if used |
-| `docs/adr` | Append-only architecture decisions; reviewers must check it | no (docs PR only) |
-| `docs/runbooks` | Oncall scripts; opened during incidents | no |
-| `scripts/` | One-shot dev helpers; cross-platform `sh` | no |
-| `.github/workflows` | CI/CD definitions | meta |
-| `.husky/` | Client-side commit gates | meta |
+| Path                    | Purpose                                                     | CI watches?          |
+| ----------------------- | ----------------------------------------------------------- | -------------------- |
+| `apps/api`              | Self-contained backend; can deploy independently            | `paths: apps/api/**` |
+| `apps/web`              | Self-contained frontend; can deploy independently           | `paths: apps/web/**` |
+| `packages/shared-types` | Optional TS types generated from OpenAPI                    | yes if used          |
+| `docs/adr`              | Append-only architecture decisions; reviewers must check it | no (docs PR only)    |
+| `docs/runbooks`         | Oncall scripts; opened during incidents                     | no                   |
+| `scripts/`              | One-shot dev helpers; cross-platform `sh`                   | no                   |
+| `.github/workflows`     | CI/CD definitions                                           | meta                 |
+| `.husky/`               | Client-side commit gates                                    | meta                 |
 
 ### 3.3 Naming Conventions (cross-cutting)
 
-| Element | Rule | Example |
-|---|---|---|
-| Branch | `<type>/<phase>-<slice>` | `feat/p2-auth-refresh-rotation` |
-| Commit | Conventional | `feat(auth): rotate refresh on each use` |
-| Python module | `snake_case` | `task_service.py` |
-| Python class | `PascalCase` | `TaskService` |
-| TS component | `PascalCase` file = component | `TaskCard.tsx` |
-| TS hook | `useCamelCase` | `useProjectTasks.ts` |
-| Env var | `UPPER_SNAKE` | `JWT_REFRESH_SECRET` |
-| DB column | `snake_case` | `assignee_id` |
-| API path | `/kebab-case` | `/projects/{id}/transfer-owner` |
+| Element       | Rule                          | Example                                  |
+| ------------- | ----------------------------- | ---------------------------------------- |
+| Branch        | `<type>/<phase>-<slice>`      | `feat/p2-auth-refresh-rotation`          |
+| Commit        | Conventional                  | `feat(auth): rotate refresh on each use` |
+| Python module | `snake_case`                  | `task_service.py`                        |
+| Python class  | `PascalCase`                  | `TaskService`                            |
+| TS component  | `PascalCase` file = component | `TaskCard.tsx`                           |
+| TS hook       | `useCamelCase`                | `useProjectTasks.ts`                     |
+| Env var       | `UPPER_SNAKE`                 | `JWT_REFRESH_SECRET`                     |
+| DB column     | `snake_case`                  | `assignee_id`                            |
+| API path      | `/kebab-case`                 | `/projects/{id}/transfer-owner`          |
 
 ### 3.4 Shared Configuration Strategy
 
@@ -385,11 +389,13 @@ pnpm --version    # → 9.x
 ```
 
 `.nvmrc`:
+
 ```
 20
 ```
 
 `.tool-versions` (for asdf users; optional):
+
 ```
 nodejs 20.11.1
 python 3.12.4
@@ -414,6 +420,7 @@ uv python install 3.12
 ```
 
 **Why uv?**
+
 1. Lockfile (`uv.lock`) guarantees reproducible builds across CI / Railway.
 2. Resolves and installs in seconds even for fat deps.
 3. Single binary, no global Python pollution.
@@ -431,6 +438,7 @@ docker compose logs postgres --tail 20
 ```
 
 Local DSN:
+
 ```
 postgresql+asyncpg://postgres:postgres@localhost:5432/ttm
 ```
@@ -461,6 +469,7 @@ pnpm install                          # installs all workspace deps + hooks
 ```
 
 This will:
+
 - Resolve `pnpm-workspace.yaml` → installs `apps/web` deps.
 - Install root devDeps (husky, commitlint, prettier).
 - Run `husky install` automatically via the `prepare` script.
@@ -476,12 +485,14 @@ uv sync                               # installs deps from pyproject.toml + uv.l
 ```
 
 Copy env:
+
 ```bash
 cp .env.example .env
 # edit DATABASE_URL, JWT_SECRET, JWT_REFRESH_SECRET
 ```
 
 Generate strong secrets:
+
 ```bash
 python -c "import secrets; print(secrets.token_urlsafe(48))"
 ```
@@ -494,6 +505,7 @@ alembic upgrade head                  # apply all migrations
 ```
 
 Optional seed:
+
 ```bash
 python scripts/seed.py                # demo user, project, tasks
 ```
@@ -522,6 +534,7 @@ cd apps/web && pnpm dev
 ```
 
 Open:
+
 - Web: http://localhost:5173
 - API: http://localhost:8000
 - Docs: http://localhost:8000/docs
@@ -541,11 +554,13 @@ railway link                            # link this repo to a Railway project
 ### 4.12 Config-File Templates (paste verbatim)
 
 #### `.nvmrc`
+
 ```
 20
 ```
 
 #### `.editorconfig`
+
 ```ini
 root = true
 
@@ -570,6 +585,7 @@ indent_style = tab
 ```
 
 #### `.gitignore` (root, abridged)
+
 ```gitignore
 # Python
 __pycache__/
@@ -616,6 +632,7 @@ test-results/
 ```
 
 #### `.env.example` (api)
+
 ```env
 ENVIRONMENT=local
 APP_VERSION=0.1.0
@@ -638,6 +655,7 @@ REDIS_URL=
 ```
 
 #### `.env.example` (web)
+
 ```env
 VITE_API_BASE_URL=http://localhost:8000/v1
 VITE_ENVIRONMENT=local
@@ -646,6 +664,7 @@ VITE_COMMIT_SHA=local
 ```
 
 #### `package.json` (root, workspace)
+
 ```json
 {
   "name": "ethara-monorepo",
@@ -678,6 +697,7 @@ VITE_COMMIT_SHA=local
 ```
 
 #### `pnpm-workspace.yaml`
+
 ```yaml
 packages:
   - "apps/*"
@@ -685,6 +705,7 @@ packages:
 ```
 
 #### `.prettierrc`
+
 ```json
 {
   "semi": true,
@@ -699,6 +720,7 @@ packages:
 ```
 
 #### `apps/web/eslint.config.js` (flat config)
+
 ```js
 import js from "@eslint/js";
 import tseslint from "typescript-eslint";
@@ -728,49 +750,71 @@ export default tseslint.config(
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
       "jsx-a11y/anchor-is-valid": "error",
-      "import/order": ["error", {
-        groups: ["builtin", "external", "internal", "parent", "sibling", "index"],
-        "newlines-between": "always",
-        alphabetize: { order: "asc" }
-      }],
+      "import/order": [
+        "error",
+        {
+          groups: ["builtin", "external", "internal", "parent", "sibling", "index"],
+          "newlines-between": "always",
+          alphabetize: { order: "asc" },
+        },
+      ],
       "no-restricted-syntax": [
         "error",
-        { selector: "JSXAttribute[name.name='dangerouslySetInnerHTML']",
-          message: "dangerouslySetInnerHTML is forbidden." }
-      ]
+        {
+          selector: "JSXAttribute[name.name='dangerouslySetInnerHTML']",
+          message: "dangerouslySetInnerHTML is forbidden.",
+        },
+      ],
     },
-    settings: { react: { version: "detect" } }
-  }
+    settings: { react: { version: "detect" } },
+  },
 );
 ```
 
 #### `commitlint.config.js`
+
 ```js
 export default {
   extends: ["@commitlint/config-conventional"],
   rules: {
-    "type-enum": [2, "always", [
-      "feat", "fix", "docs", "style", "refactor", "perf",
-      "test", "chore", "ci", "build", "revert"
-    ]],
+    "type-enum": [
+      2,
+      "always",
+      [
+        "feat",
+        "fix",
+        "docs",
+        "style",
+        "refactor",
+        "perf",
+        "test",
+        "chore",
+        "ci",
+        "build",
+        "revert",
+      ],
+    ],
     "scope-empty": [1, "never"],
     "subject-case": [2, "never", ["upper-case", "pascal-case"]],
-    "header-max-length": [2, "always", 100]
-  }
+    "header-max-length": [2, "always", 100],
+  },
 };
 ```
 
 #### `.husky/pre-commit`
+
 ```sh
 pnpm exec lint-staged
 ```
 
 #### `.husky/commit-msg`
+
 ```sh
 pnpm exec commitlint --edit "$1"
 ```
 
 #### `apps/api/pyproject.toml`
+
 ```toml
 [project]
 name = "ttm-api"
@@ -821,6 +865,7 @@ exclude_also = ["if TYPE_CHECKING:", "raise NotImplementedError"]
 ```
 
 #### `apps/api/ruff.toml`
+
 ```toml
 line-length = 88
 target-version = "py312"
@@ -839,6 +884,7 @@ quote-style = "double"
 ```
 
 #### `apps/api/mypy.ini`
+
 ```ini
 [mypy]
 python_version = 3.12
@@ -857,6 +903,7 @@ ignore_missing_imports = True
 ```
 
 #### `apps/api/alembic.ini` (key bits)
+
 ```ini
 [alembic]
 script_location = alembic
@@ -872,6 +919,7 @@ keys = console
 ```
 
 #### `docker-compose.yml`
+
 ```yaml
 services:
   postgres:
@@ -899,6 +947,7 @@ volumes:
 ```
 
 #### `Makefile`
+
 ```makefile
 .DEFAULT_GOAL := help
 
@@ -977,17 +1026,18 @@ openapi: ## Export OpenAPI spec
 <type>/p<phase>-<short-kebab-summary>
 ```
 
-| Type | Use |
-|---|---|
-| `feat` | New functionality |
-| `fix` | Bug fix |
-| `refactor` | Non-functional code change |
-| `chore` | Tooling, deps, build, CI |
-| `docs` | Docs only |
-| `test` | Adding/refactoring tests only |
-| `perf` | Performance change |
+| Type       | Use                           |
+| ---------- | ----------------------------- |
+| `feat`     | New functionality             |
+| `fix`      | Bug fix                       |
+| `refactor` | Non-functional code change    |
+| `chore`    | Tooling, deps, build, CI      |
+| `docs`     | Docs only                     |
+| `test`     | Adding/refactoring tests only |
+| `perf`     | Performance change            |
 
 Examples:
+
 ```
 feat/p2-auth-refresh-rotation
 fix/p4-task-fsm-reopen
@@ -1007,6 +1057,7 @@ docs/adr-0002-pagination
 ```
 
 Examples:
+
 ```
 feat(auth): rotate refresh token on each /auth/refresh call
 fix(tasks): reject assignee not in project_members
@@ -1032,27 +1083,34 @@ ci(workflows): cache uv installs between jobs
 ### 5.6 PR Standards
 
 `.github/pull_request_template.md`:
+
 ```markdown
 ## Why
+
 <one-paragraph problem statement>
 
 ## What
+
 - bullet 1
 - bullet 2
 
 ## How to test
+
 1. step
 2. step
 3. step
 
 ## Screenshots / videos
+
 <for UI changes>
 
 ## Linked spec / ADR
+
 - spec §...
 - ADR-0003
 
 ## Checklist
+
 - [ ] Tests added / updated
 - [ ] `make lint` green locally
 - [ ] `make test` green locally
@@ -1088,19 +1146,19 @@ gh pr create --title "fix(area): hotfix description" --base main
 
 ### 6.1 Phase Summary
 
-| # | Phase | Slice | Est. Hours | Depends on | Risk |
-|---|---|---|---:|---|---|
-| 0 | Repo bootstrap | tooling, hooks, CI skeleton | 6–8 | — | Low |
-| 1 | Backend foundation | app factory, DB, health, logging | 8–10 | 0 | Low |
-| 2 | Authentication | signup/login/refresh/logout + RBAC deps | 12–16 | 1 | Med — token rotation correctness |
-| 3 | Project module | Project + ProjectMember + ActivityLog wiring | 12–14 | 2 | Med — RBAC + 404/403 discipline |
-| 4 | Task module | Task CRUD, FSM, filters, optimistic concurrency | 12–14 | 3 | Med — FSM edge cases |
-| 5 | Frontend foundation | Vite, router, query, auth pages, axios refresh | 14–18 | 2 (API) | Med — refresh token race |
-| 6 | Dashboard | aggregations, my-tasks, recent-activity | 6–8 | 4 + 5 | Low |
-| 7 | UI polish | a11y, mobile, empty/error states, toasts | 8–10 | 6 | Low |
-| 8 | Testing & QA | coverage gates, Playwright golden paths | 10–12 | 7 | Med — flaky E2E |
-| 9 | Deployment | Railway, env, migrations on deploy, monitoring | 8–10 | 8 | High — first deploy gotchas |
-| **Total** | | | **96–120 h** | | |
+| #         | Phase               | Slice                                           |   Est. Hours | Depends on | Risk                             |
+| --------- | ------------------- | ----------------------------------------------- | -----------: | ---------- | -------------------------------- |
+| 0         | Repo bootstrap      | tooling, hooks, CI skeleton                     |          6–8 | —          | Low                              |
+| 1         | Backend foundation  | app factory, DB, health, logging                |         8–10 | 0          | Low                              |
+| 2         | Authentication      | signup/login/refresh/logout + RBAC deps         |        12–16 | 1          | Med — token rotation correctness |
+| 3         | Project module      | Project + ProjectMember + ActivityLog wiring    |        12–14 | 2          | Med — RBAC + 404/403 discipline  |
+| 4         | Task module         | Task CRUD, FSM, filters, optimistic concurrency |        12–14 | 3          | Med — FSM edge cases             |
+| 5         | Frontend foundation | Vite, router, query, auth pages, axios refresh  |        14–18 | 2 (API)    | Med — refresh token race         |
+| 6         | Dashboard           | aggregations, my-tasks, recent-activity         |          6–8 | 4 + 5      | Low                              |
+| 7         | UI polish           | a11y, mobile, empty/error states, toasts        |         8–10 | 6          | Low                              |
+| 8         | Testing & QA        | coverage gates, Playwright golden paths         |        10–12 | 7          | Med — flaky E2E                  |
+| 9         | Deployment          | Railway, env, migrations on deploy, monitoring  |         8–10 | 8          | High — first deploy gotchas      |
+| **Total** |                     |                                                 | **96–120 h** |            |                                  |
 
 ### 6.2 Critical Path
 
@@ -1118,16 +1176,16 @@ flowchart LR
     P8 --> P9[Phase 9<br/>Deploy]
 ```
 
-> **Optimization note:** Phase 5 can start *immediately after Phase 2* in parallel with Phase 3/4 if mocked API contracts are used. For a strict solo developer, prefer sequential to avoid context switching.
+> **Optimization note:** Phase 5 can start _immediately after Phase 2_ in parallel with Phase 3/4 if mocked API contracts are used. For a strict solo developer, prefer sequential to avoid context switching.
 
 ### 6.3 Priority Matrix
 
-| Priority | Phases |
-|---|---|
-| **Critical** (blocks everything) | 0, 1, 2 |
-| **High** (core feature set) | 3, 4, 5, 6 |
-| **Medium** (production-quality polish) | 7, 8 |
-| **Critical for launch** | 9 |
+| Priority                               | Phases     |
+| -------------------------------------- | ---------- |
+| **Critical** (blocks everything)       | 0, 1, 2    |
+| **High** (core feature set)            | 3, 4, 5, 6 |
+| **Medium** (production-quality polish) | 7, 8       |
+| **Critical for launch**                | 9          |
 
 ### 6.4 One-Time Branch Setup
 
@@ -1156,6 +1214,7 @@ git branch -a
 ```
 
 **Rules:**
+
 - All branches diverge from `main` at the initial commit — they will be rebased onto `main` just before you start working on them, picking up all previous merged work.
 - Never commit directly to `main`. Each phase goes through its branch → PR → squash merge.
 - When starting a phase: `git checkout <branch> && git rebase main` to get the latest.
@@ -1230,18 +1289,18 @@ pnpm exec prettier --check .
 
 ### 7.3 Commit Sequence
 
-| # | Type | Message |
-|---|---|---|
-| 1 | chore | `chore(repo): scaffold pnpm workspace` |
-| 2 | chore | `chore(repo): move pyproject to apps/api` |
-| 3 | chore | `chore(web): scaffold vite + react + ts` |
-| 4 | chore | `chore(web): configure tailwindcss` |
-| 5 | chore | `chore(repo): add prettier + editorconfig + nvmrc` |
-| 6 | chore | `chore(repo): add husky + commitlint + lint-staged` |
-| 7 | chore | `chore(repo): add docker-compose for postgres` |
-| 8 | chore | `chore(repo): add Makefile shortcuts` |
-| 9 | ci | `ci(workflows): add lint + typecheck workflow` |
-| 10 | docs | `docs(readme): add bootstrap instructions` |
+| #   | Type  | Message                                             |
+| --- | ----- | --------------------------------------------------- |
+| 1   | chore | `chore(repo): scaffold pnpm workspace`              |
+| 2   | chore | `chore(repo): move pyproject to apps/api`           |
+| 3   | chore | `chore(web): scaffold vite + react + ts`            |
+| 4   | chore | `chore(web): configure tailwindcss`                 |
+| 5   | chore | `chore(repo): add prettier + editorconfig + nvmrc`  |
+| 6   | chore | `chore(repo): add husky + commitlint + lint-staged` |
+| 7   | chore | `chore(repo): add docker-compose for postgres`      |
+| 8   | chore | `chore(repo): add Makefile shortcuts`               |
+| 9   | ci    | `ci(workflows): add lint + typecheck workflow`      |
+| 10  | docs  | `docs(readme): add bootstrap instructions`          |
 
 ### 7.4 Acceptance Criteria
 
@@ -1254,11 +1313,11 @@ pnpm exec prettier --check .
 
 ### 7.5 Risks & Mitigations
 
-| Risk | Mitigation |
-|---|---|
+| Risk                                                       | Mitigation                                                                     |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------ |
 | Workspace pollution (frontend touches root `node_modules`) | Use `pnpm` (content-addressed); root `package.json` declares only dev tooling. |
-| Husky hooks not running for fresh clones | Use `prepare` script + document in README. |
-| Windows line-endings | `.gitattributes` with `* text=auto eol=lf`. |
+| Husky hooks not running for fresh clones                   | Use `prepare` script + document in README.                                     |
+| Windows line-endings                                       | `.gitattributes` with `* text=auto eol=lf`.                                    |
 
 ### 7.6 Rollback
 
@@ -1266,6 +1325,7 @@ pnpm exec prettier --check .
 git checkout main
 git branch -D chore/p0-bootstrap
 ```
+
 Repo state remains as it was post-`uv init`. No infra side-effects.
 
 ---
@@ -1296,6 +1356,7 @@ Repo state remains as it was post-`uv init`. No infra side-effects.
 ### 8.2 Key Implementation Sketches
 
 **`app/main.py`**
+
 ```python
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
@@ -1338,6 +1399,7 @@ app = create_app()
 ```
 
 **`app/core/config.py`**
+
 ```python
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -1368,6 +1430,7 @@ settings = Settings()  # raises ValidationError at import if vars missing
 ```
 
 **`app/db/session.py`**
+
 ```python
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine, AsyncSession
 from app.core.config import settings
@@ -1384,21 +1447,21 @@ AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 
 ### 8.3 Commit Sequence
 
-| # | Type | Message |
-|---|---|---|
-| 1 | chore | `chore(api): add app/ package scaffolding` |
-| 2 | feat | `feat(api): add Settings via pydantic-settings` |
-| 3 | feat | `feat(api): configure structlog with json/console renderers` |
-| 4 | feat | `feat(api): wire AsyncEngine + AsyncSessionLocal` |
-| 5 | feat | `feat(api): add Base + TimestampMixin + SoftDeleteMixin` |
-| 6 | feat | `feat(api): add RequestIDMiddleware` |
-| 7 | feat | `feat(api): add LoggingMiddleware` |
-| 8 | feat | `feat(api): install global exception handlers` |
-| 9 | feat | `feat(api): add /health endpoint with DB ping` |
-| 10 | feat | `feat(api): initialize Alembic with async env` |
-| 11 | feat | `feat(api): create initial empty migration` |
-| 12 | test | `test(health): cover ok and db-down paths` |
-| 13 | ci | `ci(workflows): add backend lint + test job` |
+| #   | Type  | Message                                                      |
+| --- | ----- | ------------------------------------------------------------ |
+| 1   | chore | `chore(api): add app/ package scaffolding`                   |
+| 2   | feat  | `feat(api): add Settings via pydantic-settings`              |
+| 3   | feat  | `feat(api): configure structlog with json/console renderers` |
+| 4   | feat  | `feat(api): wire AsyncEngine + AsyncSessionLocal`            |
+| 5   | feat  | `feat(api): add Base + TimestampMixin + SoftDeleteMixin`     |
+| 6   | feat  | `feat(api): add RequestIDMiddleware`                         |
+| 7   | feat  | `feat(api): add LoggingMiddleware`                           |
+| 8   | feat  | `feat(api): install global exception handlers`               |
+| 9   | feat  | `feat(api): add /health endpoint with DB ping`               |
+| 10  | feat  | `feat(api): initialize Alembic with async env`               |
+| 11  | feat  | `feat(api): create initial empty migration`                  |
+| 12  | test  | `test(health): cover ok and db-down paths`                   |
+| 13  | ci    | `ci(workflows): add backend lint + test job`                 |
 
 ### 8.4 Acceptance Criteria
 
@@ -1412,12 +1475,12 @@ AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 
 ### 8.5 Risks & Mitigations
 
-| Risk | Mitigation |
-|---|---|
-| `MissingGreenlet` from sync-style DB calls | Always `await` async session methods; mypy `strict` flags this. |
-| Forgot to load `.env` | `Settings()` raises at import — fail fast. |
-| Alembic autogenerate empty for first migration | Empty is correct here — models added in Phase 2+. |
-| structlog config not applied | Call `configure_logging()` **before** `FastAPI()` instantiation. |
+| Risk                                           | Mitigation                                                       |
+| ---------------------------------------------- | ---------------------------------------------------------------- |
+| `MissingGreenlet` from sync-style DB calls     | Always `await` async session methods; mypy `strict` flags this.  |
+| Forgot to load `.env`                          | `Settings()` raises at import — fail fast.                       |
+| Alembic autogenerate empty for first migration | Empty is correct here — models added in Phase 2+.                |
+| structlog config not applied                   | Call `configure_logging()` **before** `FastAPI()` instantiation. |
 
 ### 8.6 Rollback
 
@@ -1425,6 +1488,7 @@ AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 git reset --hard main      # if local
 # or revert PR via GitHub UI
 ```
+
 No DB state created yet; nothing to clean up.
 
 ---
@@ -1471,22 +1535,22 @@ async def rotate_refresh(token_str: str, db: AsyncSession) -> tuple[str, str]:
 
 ### 9.3 Commit Sequence
 
-| # | Type | Message |
-|---|---|---|
-| 1 | feat | `feat(db): add User model and migration` |
-| 2 | feat | `feat(db): add RefreshToken model and migration` |
-| 3 | feat | `feat(auth): add bcrypt password hashing utilities` |
-| 4 | feat | `feat(auth): add JWT encode/decode with jti claim` |
-| 5 | feat | `feat(auth): add auth_service with signup/login` |
-| 6 | feat | `feat(auth): implement refresh rotation with reuse detection` |
-| 7 | feat | `feat(auth): add OAuth2PasswordBearer + get_current_user dep` |
-| 8 | feat | `feat(auth): add /v1/auth routes (signup, login, refresh, logout, me)` |
-| 9 | feat | `feat(auth): rate-limit /v1/auth/* via slowapi` |
-| 10 | feat | `feat(auth): add /v1/auth/change-password` |
-| 11 | test | `test(auth): cover signup happy path + EMAIL_TAKEN` |
-| 12 | test | `test(auth): cover login + INVALID_CREDENTIALS + lockout` |
-| 13 | test | `test(auth): cover refresh rotation + reuse-detection family revoke` |
-| 14 | test | `test(auth): assert no PII appears in logs` |
+| #   | Type | Message                                                                |
+| --- | ---- | ---------------------------------------------------------------------- |
+| 1   | feat | `feat(db): add User model and migration`                               |
+| 2   | feat | `feat(db): add RefreshToken model and migration`                       |
+| 3   | feat | `feat(auth): add bcrypt password hashing utilities`                    |
+| 4   | feat | `feat(auth): add JWT encode/decode with jti claim`                     |
+| 5   | feat | `feat(auth): add auth_service with signup/login`                       |
+| 6   | feat | `feat(auth): implement refresh rotation with reuse detection`          |
+| 7   | feat | `feat(auth): add OAuth2PasswordBearer + get_current_user dep`          |
+| 8   | feat | `feat(auth): add /v1/auth routes (signup, login, refresh, logout, me)` |
+| 9   | feat | `feat(auth): rate-limit /v1/auth/* via slowapi`                        |
+| 10  | feat | `feat(auth): add /v1/auth/change-password`                             |
+| 11  | test | `test(auth): cover signup happy path + EMAIL_TAKEN`                    |
+| 12  | test | `test(auth): cover login + INVALID_CREDENTIALS + lockout`              |
+| 13  | test | `test(auth): cover refresh rotation + reuse-detection family revoke`   |
+| 14  | test | `test(auth): assert no PII appears in logs`                            |
 
 ### 9.4 Acceptance Criteria
 
@@ -1501,23 +1565,23 @@ async def rotate_refresh(token_str: str, db: AsyncSession) -> tuple[str, str]:
 
 ### 9.5 Edge Cases (handled in code + tests)
 
-| Case | Behavior |
-|---|---|
-| Email already exists | 409 `EMAIL_TAKEN` (only on signup; login stays generic) |
-| Expired access | 401; client refreshes |
-| Expired refresh | 401 `REFRESH_EXPIRED`; force re-login |
-| Reused refresh | 401 `REFRESH_REUSED`; family revoked |
-| Account locked | 423 `ACCOUNT_LOCKED` with `Retry-After` |
-| Password change | Revoke all refresh families |
+| Case                          | Behavior                                                                        |
+| ----------------------------- | ------------------------------------------------------------------------------- |
+| Email already exists          | 409 `EMAIL_TAKEN` (only on signup; login stays generic)                         |
+| Expired access                | 401; client refreshes                                                           |
+| Expired refresh               | 401 `REFRESH_EXPIRED`; force re-login                                           |
+| Reused refresh                | 401 `REFRESH_REUSED`; family revoked                                            |
+| Account locked                | 423 `ACCOUNT_LOCKED` with `Retry-After`                                         |
+| Password change               | Revoke all refresh families                                                     |
 | Concurrent refresh (two tabs) | DB unique constraint serializes; loser gets 401, refetches with surviving token |
 
 ### 9.6 Risks & Mitigations
 
-| Risk | Mitigation |
-|---|---|
-| Cookie not sent cross-port in dev (5173 ↔ 8000) | Use Vite proxy: `vite.config.ts` proxies `/v1` → `http://localhost:8000` |
-| `SameSite=Strict` blocks the cookie on cross-origin | Frontend served same-site in production via Railway |
-| JWT secrets leaked in logs | `model_config: extra="forbid"` + `SecretStr` for password fields |
+| Risk                                                | Mitigation                                                               |
+| --------------------------------------------------- | ------------------------------------------------------------------------ |
+| Cookie not sent cross-port in dev (5173 ↔ 8000)     | Use Vite proxy: `vite.config.ts` proxies `/v1` → `http://localhost:8000` |
+| `SameSite=Strict` blocks the cookie on cross-origin | Frontend served same-site in production via Railway                      |
+| JWT secrets leaked in logs                          | `model_config: extra="forbid"` + `SecretStr` for password fields         |
 
 ### 9.7 Rollback
 
@@ -1572,22 +1636,22 @@ class ProjectService:
 
 ### 10.3 Commit Sequence
 
-| # | Type | Message |
-|---|---|---|
-| 1 | feat | `feat(db): add Project model and migration` |
-| 2 | feat | `feat(db): add ProjectMember with unique (project, user)` |
-| 3 | feat | `feat(db): add ActivityLog with jsonb metadata` |
-| 4 | feat | `feat(repos): add projects, members, activity repositories` |
-| 5 | feat | `feat(auth): add require_project_member + require_project_admin deps` |
-| 6 | feat | `feat(projects): service + routes for CRUD` |
-| 7 | feat | `feat(projects): enforce 404 on non-member reads` |
-| 8 | feat | `feat(members): invite by email of existing user` |
-| 9 | feat | `feat(members): change role + remove + last-admin guard` |
-| 10 | feat | `feat(projects): transfer ownership endpoint` |
-| 11 | feat | `feat(activity): write log entries in same transaction` |
-| 12 | test | `test(projects): RBAC matrix (admin × member × non-member)` |
-| 13 | test | `test(members): last-admin demotion blocked` |
-| 14 | test | `test(members): cannot remove owner without transfer` |
+| #   | Type | Message                                                               |
+| --- | ---- | --------------------------------------------------------------------- |
+| 1   | feat | `feat(db): add Project model and migration`                           |
+| 2   | feat | `feat(db): add ProjectMember with unique (project, user)`             |
+| 3   | feat | `feat(db): add ActivityLog with jsonb metadata`                       |
+| 4   | feat | `feat(repos): add projects, members, activity repositories`           |
+| 5   | feat | `feat(auth): add require_project_member + require_project_admin deps` |
+| 6   | feat | `feat(projects): service + routes for CRUD`                           |
+| 7   | feat | `feat(projects): enforce 404 on non-member reads`                     |
+| 8   | feat | `feat(members): invite by email of existing user`                     |
+| 9   | feat | `feat(members): change role + remove + last-admin guard`              |
+| 10  | feat | `feat(projects): transfer ownership endpoint`                         |
+| 11  | feat | `feat(activity): write log entries in same transaction`               |
+| 12  | test | `test(projects): RBAC matrix (admin × member × non-member)`           |
+| 13  | test | `test(members): last-admin demotion blocked`                          |
+| 14  | test | `test(members): cannot remove owner without transfer`                 |
 
 ### 10.4 Acceptance Criteria
 
@@ -1601,11 +1665,11 @@ class ProjectService:
 
 ### 10.5 Risks
 
-| Risk | Mitigation |
-|---|---|
+| Risk                               | Mitigation                                                                           |
+| ---------------------------------- | ------------------------------------------------------------------------------------ |
 | 404 vs 403 mistakes leak existence | Centralize in `require_project_member` — never raise 403 if membership lookup fails. |
-| Forgetting to log activity | Activity write is the **last** step in every service method; reviewers grep for it. |
-| `ON DELETE` cascading by accident | Migrations explicit; reviewed line-by-line. |
+| Forgetting to log activity         | Activity write is the **last** step in every service method; reviewers grep for it.  |
+| `ON DELETE` cascading by accident  | Migrations explicit; reviewed line-by-line.                                          |
 
 ---
 
@@ -1656,21 +1720,21 @@ async def update(db, *, task: Task, payload: TaskUpdate, if_match: datetime | No
 
 ### 11.4 Commit Sequence
 
-| # | Type | Message |
-|---|---|---|
-| 1 | feat | `feat(db): add Task model with enums and migration` |
-| 2 | feat | `feat(db): add partial indexes for tasks (project_alive, assignee_open, due_date)` |
-| 3 | feat | `feat(repos): add tasks repo with filters and pagination` |
-| 4 | feat | `feat(tasks): service with FSM enforcement` |
-| 5 | feat | `feat(tasks): validate assignee is project member` |
-| 6 | feat | `feat(tasks): routes for CRUD + /status` |
-| 7 | feat | `feat(tasks): If-Match optimistic concurrency` |
-| 8 | feat | `feat(members): null assignee on member removal` |
-| 9 | feat | `feat(activity): log all task mutations` |
-| 10 | test | `test(tasks): FSM allowed and rejected transitions` |
-| 11 | test | `test(tasks): filters + pagination + sort` |
-| 12 | test | `test(tasks): If-Match mismatch returns 412` |
-| 13 | test | `test(members): removal nulls assignments` |
+| #   | Type | Message                                                                            |
+| --- | ---- | ---------------------------------------------------------------------------------- |
+| 1   | feat | `feat(db): add Task model with enums and migration`                                |
+| 2   | feat | `feat(db): add partial indexes for tasks (project_alive, assignee_open, due_date)` |
+| 3   | feat | `feat(repos): add tasks repo with filters and pagination`                          |
+| 4   | feat | `feat(tasks): service with FSM enforcement`                                        |
+| 5   | feat | `feat(tasks): validate assignee is project member`                                 |
+| 6   | feat | `feat(tasks): routes for CRUD + /status`                                           |
+| 7   | feat | `feat(tasks): If-Match optimistic concurrency`                                     |
+| 8   | feat | `feat(members): null assignee on member removal`                                   |
+| 9   | feat | `feat(activity): log all task mutations`                                           |
+| 10  | test | `test(tasks): FSM allowed and rejected transitions`                                |
+| 11  | test | `test(tasks): filters + pagination + sort`                                         |
+| 12  | test | `test(tasks): If-Match mismatch returns 412`                                       |
+| 13  | test | `test(members): removal nulls assignments`                                         |
 
 ### 11.5 Acceptance Criteria
 
@@ -1683,10 +1747,10 @@ async def update(db, *, task: Task, payload: TaskUpdate, if_match: datetime | No
 
 ### 11.6 Risks
 
-| Risk | Mitigation |
-|---|---|
-| N+1 on list endpoint (member lookups) | `selectinload(Task.assignee)` |
-| Date timezone bugs | `due_date` is `DATE` (no time); compared to DB `CURRENT_DATE`. |
+| Risk                                      | Mitigation                                                      |
+| ----------------------------------------- | --------------------------------------------------------------- |
+| N+1 on list endpoint (member lookups)     | `selectinload(Task.assignee)`                                   |
+| Date timezone bugs                        | `due_date` is `DATE` (no time); compared to DB `CURRENT_DATE`.  |
 | FSM rules drift between client and server | Server is the only authority; client just suggests transitions. |
 
 ---
@@ -1719,10 +1783,13 @@ async def update(db, *, task: Task, payload: TaskUpdate, if_match: datetime | No
 let inflightRefresh: Promise<string | null> | null = null;
 
 async function attemptRefresh(): Promise<string | null> {
-  inflightRefresh ??= api.post("/auth/refresh")
+  inflightRefresh ??= api
+    .post("/auth/refresh")
     .then((r) => r.data.data.access_token as string)
     .catch(() => null)
-    .finally(() => { inflightRefresh = null; });
+    .finally(() => {
+      inflightRefresh = null;
+    });
   return inflightRefresh;
 }
 ```
@@ -1731,22 +1798,22 @@ All concurrent 401s share one refresh promise — prevents double-rotation.
 
 ### 12.3 Commit Sequence
 
-| # | Type | Message |
-|---|---|---|
-| 1 | chore | `chore(web): configure Vite path alias and dev proxy` |
-| 2 | chore | `chore(web): configure tailwind with design tokens` |
-| 3 | feat | `feat(web): add QueryClient with defaults` |
-| 4 | feat | `feat(web): add Zustand auth store` |
-| 5 | feat | `feat(web): add axios client with bearer + refresh interceptor` |
-| 6 | feat | `feat(web): add UI primitives (Button, Input, Card, Toast, Skeleton)` |
-| 7 | feat | `feat(web): add Dialog primitive on Radix` |
-| 8 | feat | `feat(web): add router with lazy routes` |
-| 9 | feat | `feat(web): add ProtectedRoute HOC` |
-| 10 | feat | `feat(web): add LoginPage with RHF + Zod` |
-| 11 | feat | `feat(web): add SignupPage with RHF + Zod` |
-| 12 | feat | `feat(web): add AppShell with sidebar and topbar` |
-| 13 | feat | `feat(web): hydrate auth via /auth/me on boot` |
-| 14 | test | `test(web): unit test refresh interceptor race` |
+| #   | Type  | Message                                                               |
+| --- | ----- | --------------------------------------------------------------------- |
+| 1   | chore | `chore(web): configure Vite path alias and dev proxy`                 |
+| 2   | chore | `chore(web): configure tailwind with design tokens`                   |
+| 3   | feat  | `feat(web): add QueryClient with defaults`                            |
+| 4   | feat  | `feat(web): add Zustand auth store`                                   |
+| 5   | feat  | `feat(web): add axios client with bearer + refresh interceptor`       |
+| 6   | feat  | `feat(web): add UI primitives (Button, Input, Card, Toast, Skeleton)` |
+| 7   | feat  | `feat(web): add Dialog primitive on Radix`                            |
+| 8   | feat  | `feat(web): add router with lazy routes`                              |
+| 9   | feat  | `feat(web): add ProtectedRoute HOC`                                   |
+| 10  | feat  | `feat(web): add LoginPage with RHF + Zod`                             |
+| 11  | feat  | `feat(web): add SignupPage with RHF + Zod`                            |
+| 12  | feat  | `feat(web): add AppShell with sidebar and topbar`                     |
+| 13  | feat  | `feat(web): hydrate auth via /auth/me on boot`                        |
+| 14  | test  | `test(web): unit test refresh interceptor race`                       |
 
 ### 12.4 Acceptance Criteria
 
@@ -1759,11 +1826,11 @@ All concurrent 401s share one refresh promise — prevents double-rotation.
 
 ### 12.5 Risks
 
-| Risk | Mitigation |
-|---|---|
-| Refresh interceptor infinite loop | `config._retry` flag set on the retried request. |
-| Vite dev cookie SameSite issues | Use Vite proxy; backend issues cookies on the proxied origin. |
-| Hydration race (rendering before `/auth/me`) | `<FullPageSkeleton>` while `isLoading` is true. |
+| Risk                                         | Mitigation                                                    |
+| -------------------------------------------- | ------------------------------------------------------------- |
+| Refresh interceptor infinite loop            | `config._retry` flag set on the retried request.              |
+| Vite dev cookie SameSite issues              | Use Vite proxy; backend issues cookies on the proxied origin. |
+| Hydration race (rendering before `/auth/me`) | `<FullPageSkeleton>` while `isLoading` is true.               |
 
 ---
 
@@ -1802,18 +1869,18 @@ async def stats(db, user_id) -> DashboardStats:
 
 ### 13.3 Commit Sequence
 
-| # | Type | Message |
-|---|---|---|
-| 1 | feat | `feat(dashboard): service with aggregate SQL queries` |
-| 2 | feat | `feat(dashboard): /v1/dashboard/stats route` |
-| 3 | feat | `feat(dashboard): /v1/dashboard/my-tasks route` |
-| 4 | feat | `feat(dashboard): /v1/dashboard/recent-activity route` |
-| 5 | feat | `feat(dashboard): optional redis cache with TTL` |
-| 6 | feat | `feat(web): DashboardPage with stat cards` |
-| 7 | feat | `feat(web): MyTasks list component` |
-| 8 | feat | `feat(web): RecentActivity feed component` |
-| 9 | test | `test(dashboard): aggregations match underlying data` |
-| 10 | test | `test(dashboard): respects RBAC scope` |
+| #   | Type | Message                                                |
+| --- | ---- | ------------------------------------------------------ |
+| 1   | feat | `feat(dashboard): service with aggregate SQL queries`  |
+| 2   | feat | `feat(dashboard): /v1/dashboard/stats route`           |
+| 3   | feat | `feat(dashboard): /v1/dashboard/my-tasks route`        |
+| 4   | feat | `feat(dashboard): /v1/dashboard/recent-activity route` |
+| 5   | feat | `feat(dashboard): optional redis cache with TTL`       |
+| 6   | feat | `feat(web): DashboardPage with stat cards`             |
+| 7   | feat | `feat(web): MyTasks list component`                    |
+| 8   | feat | `feat(web): RecentActivity feed component`             |
+| 9   | test | `test(dashboard): aggregations match underlying data`  |
+| 10  | test | `test(dashboard): respects RBAC scope`                 |
 
 ### 13.4 Acceptance Criteria
 
@@ -1850,17 +1917,17 @@ async def stats(db, user_id) -> DashboardStats:
 
 ### 14.2 Commit Sequence
 
-| # | Type | Message |
-|---|---|---|
-| 1 | feat | `feat(ui): add skeleton screens for project + task lists` |
-| 2 | feat | `feat(ui): add empty state component and copy` |
-| 3 | feat | `feat(ui): add toast provider with success/error variants` |
-| 4 | feat | `feat(ui): add error boundary surfacing request-id` |
-| 5 | feat | `feat(ui): add keyboard shortcut layer` |
-| 6 | refactor | `refactor(ui): collapse sidebar into drawer below md` |
-| 7 | refactor | `refactor(ui): turn tables into card lists below md` |
-| 8 | feat | `feat(ui): add dark mode toggle` |
-| 9 | chore | `chore(ci): add axe-core check on key pages` |
+| #   | Type     | Message                                                    |
+| --- | -------- | ---------------------------------------------------------- |
+| 1   | feat     | `feat(ui): add skeleton screens for project + task lists`  |
+| 2   | feat     | `feat(ui): add empty state component and copy`             |
+| 3   | feat     | `feat(ui): add toast provider with success/error variants` |
+| 4   | feat     | `feat(ui): add error boundary surfacing request-id`        |
+| 5   | feat     | `feat(ui): add keyboard shortcut layer`                    |
+| 6   | refactor | `refactor(ui): collapse sidebar into drawer below md`      |
+| 7   | refactor | `refactor(ui): turn tables into card lists below md`       |
+| 8   | feat     | `feat(ui): add dark mode toggle`                           |
+| 9   | chore    | `chore(ci): add axe-core check on key pages`               |
 
 ### 14.3 Acceptance Criteria
 
@@ -1883,12 +1950,12 @@ async def stats(db, user_id) -> DashboardStats:
 
 ### 15.1 Test Strategy (recap from spec §19)
 
-| Layer | Tool | Target |
-|---|---|---|
-| Unit (BE) | pytest | ≥ 90% on services |
-| Integration (BE) | pytest + httpx + real PG | every endpoint at least once |
-| Unit/component (FE) | Vitest + RTL | ≥ 70% statements |
-| E2E | Playwright | golden paths only |
+| Layer               | Tool                     | Target                       |
+| ------------------- | ------------------------ | ---------------------------- |
+| Unit (BE)           | pytest                   | ≥ 90% on services            |
+| Integration (BE)    | pytest + httpx + real PG | every endpoint at least once |
+| Unit/component (FE) | Vitest + RTL             | ≥ 70% statements             |
+| E2E                 | Playwright               | golden paths only            |
 
 ### 15.2 Backend Test Fixtures (canonical)
 
@@ -1928,17 +1995,17 @@ test("signup → project → invite → task → done", async ({ page }) => {
 
 ### 15.4 Commit Sequence
 
-| # | Type | Message |
-|---|---|---|
-| 1 | test | `test(api): add base fixtures with per-test rollback` |
-| 2 | test | `test(api): add factory-boy factories` |
-| 3 | test | `test(projects): cover full RBAC matrix` |
-| 4 | test | `test(tasks): cover FSM exhaustively` |
-| 5 | test | `test(web): unit tests for axios refresh logic` |
-| 6 | test | `test(web): component tests for forms` |
-| 7 | test | `test(e2e): playwright golden path` |
-| 8 | ci | `ci(workflows): enforce 80% backend coverage gate` |
-| 9 | ci | `ci(workflows): add nightly e2e workflow` |
+| #   | Type | Message                                               |
+| --- | ---- | ----------------------------------------------------- |
+| 1   | test | `test(api): add base fixtures with per-test rollback` |
+| 2   | test | `test(api): add factory-boy factories`                |
+| 3   | test | `test(projects): cover full RBAC matrix`              |
+| 4   | test | `test(tasks): cover FSM exhaustively`                 |
+| 5   | test | `test(web): unit tests for axios refresh logic`       |
+| 6   | test | `test(web): component tests for forms`                |
+| 7   | test | `test(e2e): playwright golden path`                   |
+| 8   | ci   | `ci(workflows): enforce 80% backend coverage gate`    |
+| 9   | ci   | `ci(workflows): add nightly e2e workflow`             |
 
 ### 15.5 Acceptance Criteria
 
@@ -1959,14 +2026,15 @@ test("signup → project → invite → task → done", async ({ page }) => {
 
 ### 16.1 Railway Services
 
-| Service | Purpose | Build | Start |
-|---|---|---|---|
-| `api` | FastAPI backend | `uv sync --no-dev` | `alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 2` |
-| `web` | React SPA | `pnpm install --frozen-lockfile && pnpm build` | `node serve.js` (or static adapter) |
-| `postgres` | Managed addon | — | — |
-| `redis` (optional) | Managed addon | — | — |
+| Service            | Purpose         | Build                                          | Start                                                                                  |
+| ------------------ | --------------- | ---------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `api`              | FastAPI backend | `uv sync --no-dev`                             | `alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 2` |
+| `web`              | React SPA       | `pnpm install --frozen-lockfile && pnpm build` | `node serve.js` (or static adapter)                                                    |
+| `postgres`         | Managed addon   | —                                              | —                                                                                      |
+| `redis` (optional) | Managed addon   | —                                              | —                                                                                      |
 
 ### 16.2 `apps/api/railway.toml`
+
 ```toml
 [build]
 builder = "NIXPACKS"
@@ -1982,6 +2050,7 @@ numReplicas = 1
 ```
 
 ### 16.3 `apps/web/railway.toml`
+
 ```toml
 [build]
 builder = "NIXPACKS"
@@ -2008,24 +2077,24 @@ restartPolicyType = "ON_FAILURE"
 
 ### 16.5 Commit Sequence
 
-| # | Type | Message |
-|---|---|---|
-| 1 | chore | `chore(deploy): add railway.toml for api service` |
-| 2 | chore | `chore(deploy): add railway.toml for web service` |
-| 3 | chore | `chore(deploy): document env vars in .env.example` |
-| 4 | feat | `feat(api): /v1/health pings DB and returns version` |
-| 5 | chore | `chore(deploy): add seed script for first-deploy demo user` |
-| 6 | docs | `docs(runbooks): add deploy.md + rollback.md` |
-| 7 | docs | `docs(readme): add demo credentials and live URL` |
+| #   | Type  | Message                                                     |
+| --- | ----- | ----------------------------------------------------------- |
+| 1   | chore | `chore(deploy): add railway.toml for api service`           |
+| 2   | chore | `chore(deploy): add railway.toml for web service`           |
+| 3   | chore | `chore(deploy): document env vars in .env.example`          |
+| 4   | feat  | `feat(api): /v1/health pings DB and returns version`        |
+| 5   | chore | `chore(deploy): add seed script for first-deploy demo user` |
+| 6   | docs  | `docs(runbooks): add deploy.md + rollback.md`               |
+| 7   | docs  | `docs(readme): add demo credentials and live URL`           |
 
 ### 16.6 Rollback Strategy
 
-| Failure | Action |
-|---|---|
-| Migration fails | Deploy halts; previous service stays live. Investigate locally with prod DB clone. |
-| Code regression after deploy | Railway → previous deployment → "Redeploy". |
-| Bad migration on live data | `alembic downgrade -1` from `railway run` if reversible; else point-in-time restore. |
-| Cookies/CORS broken in prod | Check `FRONTEND_URLS`, custom domain, SameSite. Patch + redeploy. |
+| Failure                      | Action                                                                               |
+| ---------------------------- | ------------------------------------------------------------------------------------ |
+| Migration fails              | Deploy halts; previous service stays live. Investigate locally with prod DB clone.   |
+| Code regression after deploy | Railway → previous deployment → "Redeploy".                                          |
+| Bad migration on live data   | `alembic downgrade -1` from `railway run` if reversible; else point-in-time restore. |
+| Cookies/CORS broken in prod  | Check `FRONTEND_URLS`, custom domain, SameSite. Patch + redeploy.                    |
 
 ### 16.7 Acceptance Criteria
 
@@ -2142,7 +2211,7 @@ jobs:
 name: E2E
 
 on:
-  schedule: [{ cron: "0 6 * * *" }]   # nightly
+  schedule: [{ cron: "0 6 * * *" }] # nightly
   workflow_dispatch:
 
 jobs:
@@ -2196,11 +2265,11 @@ jobs:
 
 ### 17.4 Cache Strategy
 
-| Cache | Where | Hit benefit |
-|---|---|---|
-| `uv` cache | `astral-sh/setup-uv@v3` | ~30 s → ~3 s install |
-| pnpm store | `actions/setup-node@v4 cache:pnpm` | ~40 s → ~5 s install |
-| Playwright browsers | `~/.cache/ms-playwright` | ~60 s → ~5 s |
+| Cache               | Where                              | Hit benefit          |
+| ------------------- | ---------------------------------- | -------------------- |
+| `uv` cache          | `astral-sh/setup-uv@v3`            | ~30 s → ~3 s install |
+| pnpm store          | `actions/setup-node@v4 cache:pnpm` | ~40 s → ~5 s install |
+| Playwright browsers | `~/.cache/ms-playwright`           | ~60 s → ~5 s         |
 
 ### 17.5 Failure Notifications
 
@@ -2242,14 +2311,14 @@ Why: autogenerate produces stable, deterministic constraint names; drift between
 
 ### 18.3 Production-Safe Migration Patterns
 
-| Change | Steps |
-|---|---|
-| Add nullable column | 1 migration |
-| Add NOT NULL column with default | 1 migration (server_default) |
-| Rename column | 3 migrations across 3 deploys |
-| Drop column | 2 migrations: stop reading → drop |
-| Change column type | Expand (add new) → migrate code → contract (drop old) |
-| Add index | `CREATE INDEX CONCURRENTLY` via raw `op.execute` |
+| Change                           | Steps                                                 |
+| -------------------------------- | ----------------------------------------------------- |
+| Add nullable column              | 1 migration                                           |
+| Add NOT NULL column with default | 1 migration (server_default)                          |
+| Rename column                    | 3 migrations across 3 deploys                         |
+| Drop column                      | 2 migrations: stop reading → drop                     |
+| Change column type               | Expand (add new) → migrate code → contract (drop old) |
+| Add index                        | `CREATE INDEX CONCURRENTLY` via raw `op.execute`      |
 
 ### 18.4 Reset Strategy
 
@@ -2289,12 +2358,12 @@ Router ──► Service ──► Repository ──► ORM
 
 ### 19.2 Pydantic Conventions
 
-| Concern | Pattern |
-|---|---|
-| Request body | `*Create`, `*Update` schemas with `extra="forbid"` |
-| Response | Explicit `response_model=*Read` per endpoint |
-| Internal DTO | Optional, only when ORM model differs from response |
-| Errors | `BusinessError(code: ErrorCode, status: int, details: dict)` |
+| Concern      | Pattern                                                      |
+| ------------ | ------------------------------------------------------------ |
+| Request body | `*Create`, `*Update` schemas with `extra="forbid"`           |
+| Response     | Explicit `response_model=*Read` per endpoint                 |
+| Internal DTO | Optional, only when ORM model differs from response          |
+| Errors       | `BusinessError(code: ErrorCode, status: int, details: dict)` |
 
 ### 19.3 Pagination / Filter / Sort Grammar
 
@@ -2336,12 +2405,12 @@ class PaginationParams(BaseModel):
 
 ### 20.1 Component Split
 
-| Type | Examples | Rules |
-|---|---|---|
-| **Pages** | `ProjectsListPage` | Compose containers + layout; no data fetching directly. |
-| **Containers** | `ProjectsListContainer` | Use hooks (`useProjects`), pass props down. |
-| **Presentational** | `ProjectCard` | Pure; props in, JSX out; storybook-able. |
-| **Primitives** | `Button`, `Input` | Headless+styled; in `components/ui/`. |
+| Type               | Examples                | Rules                                                   |
+| ------------------ | ----------------------- | ------------------------------------------------------- |
+| **Pages**          | `ProjectsListPage`      | Compose containers + layout; no data fetching directly. |
+| **Containers**     | `ProjectsListContainer` | Use hooks (`useProjects`), pass props down.             |
+| **Presentational** | `ProjectCard`           | Pure; props in, JSX out; storybook-able.                |
+| **Primitives**     | `Button`, `Input`       | Headless+styled; in `components/ui/`.                   |
 
 ### 20.2 Hook Patterns
 
@@ -2394,7 +2463,7 @@ const onSubmit = form.handleSubmit(async (values) => {
     await create.mutateAsync(values);
     toast.success("Task created");
   } catch (e) {
-    applyApiErrorsToForm(form, e);   // maps field-level details from envelope
+    applyApiErrorsToForm(form, e); // maps field-level details from envelope
   }
 });
 ```
@@ -2424,12 +2493,12 @@ const onSubmit = form.handleSubmit(async (values) => {
 
 ### 21.2 Secret Rotation Runbook (`docs/runbooks/secret-rotation.md`)
 
-| Secret | Rotation cadence | Procedure |
-|---|---|---|
-| `JWT_SECRET` | Quarterly or on compromise | Set new on Railway → restart → existing sessions invalidated (acceptable trade-off) |
-| `JWT_REFRESH_SECRET` | Same as above | Same; invalidates refresh tokens |
-| `DATABASE_URL` password | On Railway rotate | Triggers redeploy automatically |
-| Sentry DSN | Per project | Update env var; restart |
+| Secret                  | Rotation cadence           | Procedure                                                                           |
+| ----------------------- | -------------------------- | ----------------------------------------------------------------------------------- |
+| `JWT_SECRET`            | Quarterly or on compromise | Set new on Railway → restart → existing sessions invalidated (acceptable trade-off) |
+| `JWT_REFRESH_SECRET`    | Same as above              | Same; invalidates refresh tokens                                                    |
+| `DATABASE_URL` password | On Railway rotate          | Triggers redeploy automatically                                                     |
+| Sentry DSN              | Per project                | Update env var; restart                                                             |
 
 ### 21.3 Rate Limiting
 
@@ -2466,15 +2535,15 @@ async def security_headers(request, call_next):
 
 ### 21.7 Threat Mitigation Summary
 
-| Threat | Mitigation |
-|---|---|
-| Brute-force login | Rate limit + lockout + constant-time bcrypt |
-| Token theft | Short access TTL + rotation + reuse detection |
-| CSRF | SameSite=Strict on refresh cookie + Bearer header for state changes |
-| XSS | React auto-escape + ESLint ban on `dangerouslySetInnerHTML` |
-| SQL injection | ORM parameterized queries only |
-| Open redirect | No URL redirects from user input |
-| Mass assignment | Pydantic `extra="forbid"` on all `*Update` schemas |
+| Threat            | Mitigation                                                          |
+| ----------------- | ------------------------------------------------------------------- |
+| Brute-force login | Rate limit + lockout + constant-time bcrypt                         |
+| Token theft       | Short access TTL + rotation + reuse detection                       |
+| CSRF              | SameSite=Strict on refresh cookie + Bearer header for state changes |
+| XSS               | React auto-escape + ESLint ban on `dangerouslySetInnerHTML`         |
+| SQL injection     | ORM parameterized queries only                                      |
+| Open redirect     | No URL redirects from user input                                    |
+| Mass assignment   | Pydantic `extra="forbid"` on all `*Update` schemas                  |
 
 ---
 
@@ -2548,13 +2617,13 @@ class RequestIDMiddleware:
 
 ### 22.5 Log Levels
 
-| Level | Use | Examples |
-|---|---|---|
-| `DEBUG` | Local only | SQL echo, hot-loop noise |
-| `INFO` | Request lifecycle | "request_started", "request_completed" |
-| `WARNING` | Degraded | "cache_miss", "redis_unavailable_fallback" |
-| `ERROR` | Handled failure with action | "external_api_failed", "business_error" |
-| `CRITICAL` | Unhandled / system-wide | Caught only by fallback handler |
+| Level      | Use                         | Examples                                   |
+| ---------- | --------------------------- | ------------------------------------------ |
+| `DEBUG`    | Local only                  | SQL echo, hot-loop noise                   |
+| `INFO`     | Request lifecycle           | "request_started", "request_completed"     |
+| `WARNING`  | Degraded                    | "cache_miss", "redis_unavailable_fallback" |
+| `ERROR`    | Handled failure with action | "external_api_failed", "business_error"    |
+| `CRITICAL` | Unhandled / system-wide     | Caught only by fallback handler            |
 
 4xx never logged at ERROR; 5xx always.
 
@@ -2577,12 +2646,12 @@ class RequestIDMiddleware:
 
 ### 23.1 Query Budgets
 
-| Endpoint class | Max queries | Reason |
-|---|---|---|
-| GET single resource | 2 (RBAC + fetch) | Includes membership check |
-| GET list | 3 (RBAC + count + page) | + 1 if joined-load |
-| POST/PATCH | 4 (RBAC + load + write + activity) | Activity log included |
-| DELETE | 3 | |
+| Endpoint class      | Max queries                        | Reason                    |
+| ------------------- | ---------------------------------- | ------------------------- |
+| GET single resource | 2 (RBAC + fetch)                   | Includes membership check |
+| GET list            | 3 (RBAC + count + page)            | + 1 if joined-load        |
+| POST/PATCH          | 4 (RBAC + load + write + activity) | Activity log included     |
+| DELETE              | 3                                  |                           |
 
 CI hint: assert query counts in critical integration tests via SQLAlchemy event hooks.
 
@@ -2598,11 +2667,11 @@ CI hint: assert query counts in critical integration tests via SQLAlchemy event 
 
 ### 23.4 Frontend Bundle Budget
 
-| Asset | Budget |
-|---|---|
+| Asset                | Budget   |
+| -------------------- | -------- |
 | Initial JS (gzipped) | ≤ 200 KB |
-| Total JS (gzipped) | ≤ 600 KB |
-| LCP image | ≤ 80 KB |
+| Total JS (gzipped)   | ≤ 600 KB |
+| LCP image            | ≤ 80 KB  |
 
 Tool: `pnpm dlx vite-bundle-visualizer apps/web/dist`.
 
@@ -2626,13 +2695,13 @@ Tool: `pnpm dlx vite-bundle-visualizer apps/web/dist`.
 
 ### 23.8 Profiling Tools
 
-| Tool | Use |
-|---|---|
-| `py-spy` | Sampling profiler in prod (read-only) |
-| `EXPLAIN ANALYZE` | DB query plans |
-| `pg_stat_statements` | Top expensive queries in prod |
-| `vite-bundle-visualizer` | Frontend bundle composition |
-| Chrome Performance tab | Frontend render profiling |
+| Tool                     | Use                                   |
+| ------------------------ | ------------------------------------- |
+| `py-spy`                 | Sampling profiler in prod (read-only) |
+| `EXPLAIN ANALYZE`        | DB query plans                        |
+| `pg_stat_statements`     | Top expensive queries in prod         |
+| `vite-bundle-visualizer` | Frontend bundle composition           |
+| Chrome Performance tab   | Frontend render profiling             |
 
 ---
 
@@ -2640,28 +2709,28 @@ Tool: `pnpm dlx vite-bundle-visualizer apps/web/dist`.
 
 (See also spec §26 for product-level edge cases. This section is **operational**.)
 
-| # | Failure mode | Detection | Recovery | User-facing |
-|---|---|---|---|---|
-| 1 | Failed migration on deploy | Migration job exits non-zero | Railway halts; old version stays | No impact |
-| 2 | Railway downtime | Status page / health check fails | Status banner; cached UI if possible | Toast "Service unavailable, retry" |
-| 3 | Leaked refresh token | Reuse-detection trips | Family revoked; user re-logs in | Sees "Session expired" → login |
-| 4 | CI flake | Recurring test failure | `git rerun` once; if persists, quarantine + fix | None |
-| 5 | Lockfile drift | CI install fails | Run `uv lock` / `pnpm install` locally; commit | None |
-| 6 | DB connection lost | `pool_pre_ping` raises | Endpoint returns 5xx; retry-on-GET in client | Toast + auto-retry |
-| 7 | Stale `If-Match` | Service returns 412 | UI prompts merge or reload | Modal "Task changed elsewhere — reload?" |
-| 8 | Concurrent member removal + task edit | `ASSIGNEE_NOT_MEMBER` raised | Service nulls assignee in same tx | UI shows "Unassigned" |
-| 9 | Token clock skew | JWT `iat` future-dated | 30 s leeway in decoder | None |
-| 10 | Rate-limit false positive (shared NAT) | 429 for legit user | Use per-user limits when authenticated | Soft toast + `Retry-After` |
-| 11 | OpenAPI drift vs client | Type errors at build | Regenerate types via `make openapi-types` | None |
-| 12 | Soft-deleted user invited | `404 USER_NOT_FOUND` | Admin re-invites once user un-soft-deleted | "User not found" |
-| 13 | Sentry not reachable | Sentry client buffers + drops | Logs still emitted to stdout | None |
-| 14 | Redis down (when wired) | Cache get fails | Code path falls back to DB | Slightly slower; no error |
-| 15 | Disk full on PG | Write fails | Railway alert; scale PG plan | 5xx until resolved |
-| 16 | Stuck deploy | `/health` 3 fails | Railway auto-rollback | Brief gap; users retry |
-| 17 | Long-lived browser tab → token expired | 401 → refresh interceptor | Single refresh; resume | Invisible to user |
-| 18 | User toggles dark mode mid-mutation | Re-render | Idempotent UI | None |
-| 19 | Browser back after logout | `/auth/me` check on mount | Redirect to `/login` | None |
-| 20 | Forced password change on compromise | All refresh families revoked | Admin endpoint (future) | Users re-login |
+| #   | Failure mode                           | Detection                        | Recovery                                        | User-facing                              |
+| --- | -------------------------------------- | -------------------------------- | ----------------------------------------------- | ---------------------------------------- |
+| 1   | Failed migration on deploy             | Migration job exits non-zero     | Railway halts; old version stays                | No impact                                |
+| 2   | Railway downtime                       | Status page / health check fails | Status banner; cached UI if possible            | Toast "Service unavailable, retry"       |
+| 3   | Leaked refresh token                   | Reuse-detection trips            | Family revoked; user re-logs in                 | Sees "Session expired" → login           |
+| 4   | CI flake                               | Recurring test failure           | `git rerun` once; if persists, quarantine + fix | None                                     |
+| 5   | Lockfile drift                         | CI install fails                 | Run `uv lock` / `pnpm install` locally; commit  | None                                     |
+| 6   | DB connection lost                     | `pool_pre_ping` raises           | Endpoint returns 5xx; retry-on-GET in client    | Toast + auto-retry                       |
+| 7   | Stale `If-Match`                       | Service returns 412              | UI prompts merge or reload                      | Modal "Task changed elsewhere — reload?" |
+| 8   | Concurrent member removal + task edit  | `ASSIGNEE_NOT_MEMBER` raised     | Service nulls assignee in same tx               | UI shows "Unassigned"                    |
+| 9   | Token clock skew                       | JWT `iat` future-dated           | 30 s leeway in decoder                          | None                                     |
+| 10  | Rate-limit false positive (shared NAT) | 429 for legit user               | Use per-user limits when authenticated          | Soft toast + `Retry-After`               |
+| 11  | OpenAPI drift vs client                | Type errors at build             | Regenerate types via `make openapi-types`       | None                                     |
+| 12  | Soft-deleted user invited              | `404 USER_NOT_FOUND`             | Admin re-invites once user un-soft-deleted      | "User not found"                         |
+| 13  | Sentry not reachable                   | Sentry client buffers + drops    | Logs still emitted to stdout                    | None                                     |
+| 14  | Redis down (when wired)                | Cache get fails                  | Code path falls back to DB                      | Slightly slower; no error                |
+| 15  | Disk full on PG                        | Write fails                      | Railway alert; scale PG plan                    | 5xx until resolved                       |
+| 16  | Stuck deploy                           | `/health` 3 fails                | Railway auto-rollback                           | Brief gap; users retry                   |
+| 17  | Long-lived browser tab → token expired | 401 → refresh interceptor        | Single refresh; resume                          | Invisible to user                        |
+| 18  | User toggles dark mode mid-mutation    | Re-render                        | Idempotent UI                                   | None                                     |
+| 19  | Browser back after logout              | `/auth/me` check on mount        | Redirect to `/login`                            | None                                     |
+| 20  | Forced password change on compromise   | All refresh families revoked     | Admin endpoint (future)                         | Users re-login                           |
 
 ---
 
@@ -2707,17 +2776,18 @@ make test
 
 ### 25.4 Debugging Loop
 
-| Symptom | First step |
-|---|---|
-| Backend 500 | Check terminal logs; grep request_id |
-| 401 loops | Check axios interceptor logic; inspect Network tab |
-| CORS error | Check `FRONTEND_URLS` env; check OPTIONS preflight in Network tab |
-| Test failure | Run single test with `-x -s`; print fixtures |
-| Slow query | `EXPLAIN ANALYZE` in psql |
+| Symptom      | First step                                                        |
+| ------------ | ----------------------------------------------------------------- |
+| Backend 500  | Check terminal logs; grep request_id                              |
+| 401 loops    | Check axios interceptor logic; inspect Network tab                |
+| CORS error   | Check `FRONTEND_URLS` env; check OPTIONS preflight in Network tab |
+| Test failure | Run single test with `-x -s`; print fixtures                      |
+| Slow query   | `EXPLAIN ANALYZE` in psql                                         |
 
 ### 25.5 IDE Setup — VS Code
 
 `.vscode/extensions.json`:
+
 ```json
 {
   "recommendations": [
@@ -2734,6 +2804,7 @@ make test
 ```
 
 `.vscode/settings.json`:
+
 ```json
 {
   "python.defaultInterpreterPath": "${workspaceFolder}/apps/api/.venv/bin/python",
@@ -2741,15 +2812,25 @@ make test
   "[python]": {
     "editor.defaultFormatter": "ms-python.black-formatter",
     "editor.formatOnSave": true,
-    "editor.codeActionsOnSave": { "source.organizeImports": "explicit", "source.fixAll": "explicit" }
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit",
+      "source.fixAll": "explicit"
+    }
   },
-  "[typescript]": { "editor.defaultFormatter": "esbenp.prettier-vscode", "editor.formatOnSave": true },
-  "[typescriptreact]": { "editor.defaultFormatter": "esbenp.prettier-vscode", "editor.formatOnSave": true },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
   "eslint.workingDirectories": ["apps/web"]
 }
 ```
 
 `.vscode/launch.json` (FastAPI debug):
+
 ```json
 {
   "version": "0.2.0",
@@ -2937,14 +3018,14 @@ make openapi
 
 ### 27.4 Component Conventions
 
-| Element | Rule |
-|---|---|
-| File | `TaskCard.tsx` (PascalCase) |
-| Hook | `useProjectTasks.ts` |
-| Test | `TaskCard.test.tsx` colocated |
-| Stories | `TaskCard.stories.tsx` (if Storybook added later) |
-| Type-only file | `types.ts` |
-| Index re-export | Allowed at feature root only for **public** API |
+| Element         | Rule                                              |
+| --------------- | ------------------------------------------------- |
+| File            | `TaskCard.tsx` (PascalCase)                       |
+| Hook            | `useProjectTasks.ts`                              |
+| Test            | `TaskCard.test.tsx` colocated                     |
+| Stories         | `TaskCard.stories.tsx` (if Storybook added later) |
+| Type-only file  | `types.ts`                                        |
+| Index re-export | Allowed at feature root only for **public** API   |
 
 ### 27.5 Folder Conventions
 
@@ -2957,18 +3038,18 @@ make openapi
 
 ## 28. Acceptance Criteria Per Phase (Sign-off Master Table)
 
-| Phase | AC summary (full inline in §7–§16) | Sign-off |
-|---|---|:---:|
-| 0 | `make bootstrap` succeeds; CI green on empty PR; husky rejects bad commits | ☐ |
-| 1 | `/v1/health` ok; alembic head; structlog with request_id; lint+type clean | ☐ |
-| 2 | Signup/login/refresh/logout/me works; refresh rotation + reuse-detection verified; rate limit + lockout active | ☐ |
-| 3 | Project + member CRUD; 404 vs 403 correct; last-admin/owner rules; activity log per mutation | ☐ |
-| 4 | Task CRUD + FSM + assignment validation + If-Match concurrency + member-removal nullifies assignments | ☐ |
-| 5 | E2E auth on real backend; refresh interceptor race-safe; a11y ≥ 95 on auth | ☐ |
-| 6 | Dashboard counts match data; works without Redis; empty states present | ☐ |
-| 7 | No bare spinners; empty/error states everywhere; 360 px viewport clean; toast on every mutation | ☐ |
-| 8 | Backend coverage ≥ 80%; frontend ≥ 70%; Playwright golden path green in CI | ☐ |
-| 9 | Live URL signs up + creates project + creates task; `/health` 200; Sentry receives test error; rollback rehearsed | ☐ |
+| Phase | AC summary (full inline in §7–§16)                                                                                | Sign-off |
+| ----- | ----------------------------------------------------------------------------------------------------------------- | :------: |
+| 0     | `make bootstrap` succeeds; CI green on empty PR; husky rejects bad commits                                        |    ☐     |
+| 1     | `/v1/health` ok; alembic head; structlog with request_id; lint+type clean                                         |    ☐     |
+| 2     | Signup/login/refresh/logout/me works; refresh rotation + reuse-detection verified; rate limit + lockout active    |    ☐     |
+| 3     | Project + member CRUD; 404 vs 403 correct; last-admin/owner rules; activity log per mutation                      |    ☐     |
+| 4     | Task CRUD + FSM + assignment validation + If-Match concurrency + member-removal nullifies assignments             |    ☐     |
+| 5     | E2E auth on real backend; refresh interceptor race-safe; a11y ≥ 95 on auth                                        |    ☐     |
+| 6     | Dashboard counts match data; works without Redis; empty states present                                            |    ☐     |
+| 7     | No bare spinners; empty/error states everywhere; 360 px viewport clean; toast on every mutation                   |    ☐     |
+| 8     | Backend coverage ≥ 80%; frontend ≥ 70%; Playwright golden path green in CI                                        |    ☐     |
+| 9     | Live URL signs up + creates project + creates task; `/health` 200; Sentry receives test error; rollback rehearsed |    ☐     |
 
 ---
 
@@ -2976,69 +3057,69 @@ make openapi
 
 ### 29.1 FastAPI / SQLAlchemy
 
-| Symptom | Diagnosis | Fix |
-|---|---|---|
-| `MissingGreenlet: greenlet_spawn` | Sync ORM call inside async context | Replace `.query(...)` with `await session.execute(select(...))` |
-| `InvalidRequestError: instance is not bound` | Detached instance after commit | Set `expire_on_commit=False` on session factory |
-| Migrations show empty diff | Models not imported in `env.py` | Import `app.models` in `alembic/env.py` |
-| `ConnectionRefusedError` on boot | PG not up / wrong port | `docker compose ps`; check `DATABASE_URL` |
-| 422 on simple bodies | `extra="forbid"` + unknown field | Inspect response `details.fields` |
+| Symptom                                      | Diagnosis                          | Fix                                                             |
+| -------------------------------------------- | ---------------------------------- | --------------------------------------------------------------- |
+| `MissingGreenlet: greenlet_spawn`            | Sync ORM call inside async context | Replace `.query(...)` with `await session.execute(select(...))` |
+| `InvalidRequestError: instance is not bound` | Detached instance after commit     | Set `expire_on_commit=False` on session factory                 |
+| Migrations show empty diff                   | Models not imported in `env.py`    | Import `app.models` in `alembic/env.py`                         |
+| `ConnectionRefusedError` on boot             | PG not up / wrong port             | `docker compose ps`; check `DATABASE_URL`                       |
+| 422 on simple bodies                         | `extra="forbid"` + unknown field   | Inspect response `details.fields`                               |
 
 ### 29.2 JWT / Auth
 
-| Symptom | Diagnosis | Fix |
-|---|---|---|
-| Infinite 401 loop on frontend | Interceptor retries without `_retry` flag | Add `if (err.config._retry) throw err;` |
-| `JWSSignatureError` | Wrong secret loaded | Verify `JWT_SECRET` in env; restart |
-| `signature has expired` immediately after issue | Clock drift | Sync NTP on host; leeway 30s |
-| Refresh cookie not received | `withCredentials: false` on axios | Set `withCredentials: true` on instance |
-| Refresh cookie not sent | Cross-origin / port mismatch | Use Vite proxy in dev |
+| Symptom                                         | Diagnosis                                 | Fix                                     |
+| ----------------------------------------------- | ----------------------------------------- | --------------------------------------- |
+| Infinite 401 loop on frontend                   | Interceptor retries without `_retry` flag | Add `if (err.config._retry) throw err;` |
+| `JWSSignatureError`                             | Wrong secret loaded                       | Verify `JWT_SECRET` in env; restart     |
+| `signature has expired` immediately after issue | Clock drift                               | Sync NTP on host; leeway 30s            |
+| Refresh cookie not received                     | `withCredentials: false` on axios         | Set `withCredentials: true` on instance |
+| Refresh cookie not sent                         | Cross-origin / port mismatch              | Use Vite proxy in dev                   |
 
 ### 29.3 CORS
 
-| Symptom | Diagnosis | Fix |
-|---|---|---|
-| "CORS policy: No Access-Control-Allow-Origin" | Frontend URL not in `FRONTEND_URLS` | Add exact origin (no trailing slash) |
-| Preflight 400 / 405 | `OPTIONS` method missing | `CORSMiddleware` covers it — verify middleware order |
-| Cookies blocked | `allow_credentials=False` | Set `True`, narrow `allow_origins` (no `*`) |
+| Symptom                                       | Diagnosis                           | Fix                                                  |
+| --------------------------------------------- | ----------------------------------- | ---------------------------------------------------- |
+| "CORS policy: No Access-Control-Allow-Origin" | Frontend URL not in `FRONTEND_URLS` | Add exact origin (no trailing slash)                 |
+| Preflight 400 / 405                           | `OPTIONS` method missing            | `CORSMiddleware` covers it — verify middleware order |
+| Cookies blocked                               | `allow_credentials=False`           | Set `True`, narrow `allow_origins` (no `*`)          |
 
 ### 29.4 Alembic
 
-| Symptom | Diagnosis | Fix |
-|---|---|---|
-| Autogenerate empty | Metadata not loaded | `from app.db.base import Base; target_metadata = Base.metadata` |
-| Constraint name drift | Default naming | Use `NAMING_CONVENTION` (cf. §18.1) |
-| Duplicate enum on rerun | Drop with enum still referenced | `op.execute("DROP TYPE IF EXISTS …")` in downgrade |
-| `Target database is not up to date` | Mismatch | `alembic current` vs `alembic heads`; `alembic upgrade head` |
+| Symptom                             | Diagnosis                       | Fix                                                             |
+| ----------------------------------- | ------------------------------- | --------------------------------------------------------------- |
+| Autogenerate empty                  | Metadata not loaded             | `from app.db.base import Base; target_metadata = Base.metadata` |
+| Constraint name drift               | Default naming                  | Use `NAMING_CONVENTION` (cf. §18.1)                             |
+| Duplicate enum on rerun             | Drop with enum still referenced | `op.execute("DROP TYPE IF EXISTS …")` in downgrade              |
+| `Target database is not up to date` | Mismatch                        | `alembic current` vs `alembic heads`; `alembic upgrade head`    |
 
 ### 29.5 PostgreSQL
 
-| Symptom | Fix |
-|---|---|
-| `password authentication failed` | Confirm Docker container env vars match `.env` |
-| Connection drops in long sessions | `pool_pre_ping=True` |
-| Slow query | `EXPLAIN ANALYZE`; add partial index |
-| `too many connections` | Lower pool size; restart pgbouncer if used |
+| Symptom                           | Fix                                            |
+| --------------------------------- | ---------------------------------------------- |
+| `password authentication failed`  | Confirm Docker container env vars match `.env` |
+| Connection drops in long sessions | `pool_pre_ping=True`                           |
+| Slow query                        | `EXPLAIN ANALYZE`; add partial index           |
+| `too many connections`            | Lower pool size; restart pgbouncer if used     |
 
 ### 29.6 Railway
 
-| Symptom | Fix |
-|---|---|
-| Build OOM | Lower workers; smaller deps; check `pnpm install` not pulling devDeps in prod |
-| Migration fails on deploy | `railway logs --service api` — read alembic output; fix locally; redeploy |
-| 502 from web | `pnpm preview` not bound to `$PORT`; use `-l $PORT --host` |
-| Env var changes not applied | Service restart required after var change |
-| Domain not resolving | TLS provisioning takes minutes; check Railway dashboard |
+| Symptom                     | Fix                                                                           |
+| --------------------------- | ----------------------------------------------------------------------------- |
+| Build OOM                   | Lower workers; smaller deps; check `pnpm install` not pulling devDeps in prod |
+| Migration fails on deploy   | `railway logs --service api` — read alembic output; fix locally; redeploy     |
+| 502 from web                | `pnpm preview` not bound to `$PORT`; use `-l $PORT --host`                    |
+| Env var changes not applied | Service restart required after var change                                     |
+| Domain not resolving        | TLS provisioning takes minutes; check Railway dashboard                       |
 
 ### 29.7 Frontend
 
-| Symptom | Fix |
-|---|---|
-| Vite HMR not reloading | Disable browser extensions; check `vite.config.ts` watch ignores |
-| `useQuery` infinite refetch | Stable `queryKey`; don't pass new object each render |
-| Tailwind class missing | `content` glob in `tailwind.config.ts` covers files |
-| Hydration mismatch | We're CSR (Vite) — likely date/timezone diff between SSR build and runtime; remove SSR if accidentally added |
-| Build error TS5023 | Stale `node_modules`; `rm -rf node_modules && pnpm install` |
+| Symptom                     | Fix                                                                                                          |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Vite HMR not reloading      | Disable browser extensions; check `vite.config.ts` watch ignores                                             |
+| `useQuery` infinite refetch | Stable `queryKey`; don't pass new object each render                                                         |
+| Tailwind class missing      | `content` glob in `tailwind.config.ts` covers files                                                          |
+| Hydration mismatch          | We're CSR (Vite) — likely date/timezone diff between SSR build and runtime; remove SSR if accidentally added |
+| Build error TS5023          | Stale `node_modules`; `rm -rf node_modules && pnpm install`                                                  |
 
 ### 29.8 Diagnosis Flow (general)
 
@@ -3056,6 +3137,7 @@ make openapi
 > **Run this checklist before flipping the production DNS / before declaring "live".**
 
 ### Security
+
 - [ ] `JWT_SECRET` and `JWT_REFRESH_SECRET` are unique 48-byte random values.
 - [ ] `bcrypt` cost = 12 (or higher per benchmark).
 - [ ] `DOCS_ENABLED=false` in production.
@@ -3068,6 +3150,7 @@ make openapi
 - [ ] Sentry capturing both ends; PII scrubbing enabled.
 
 ### Mobile / Accessibility
+
 - [ ] 360 × 640 viewport renders cleanly.
 - [ ] Touch targets ≥ 44 × 44.
 - [ ] Tab order verified on every form.
@@ -3075,12 +3158,14 @@ make openapi
 - [ ] Tested on iOS Safari + Android Chrome.
 
 ### Lighthouse
+
 - [ ] Performance ≥ 90 (Dashboard, Projects, Tasks).
 - [ ] Accessibility ≥ 95.
 - [ ] Best Practices ≥ 90.
 - [ ] SEO ≥ 80.
 
 ### API
+
 - [ ] OpenAPI exported + committed (`apps/api/openapi.json`).
 - [ ] Every endpoint has `response_model`.
 - [ ] All errors conform to envelope schema.
@@ -3088,12 +3173,14 @@ make openapi
 - [ ] Idempotency-Key honored on POST mutations creating resources.
 
 ### Errors
+
 - [ ] Frontend ErrorBoundary surfaces request-id.
 - [ ] 4xx never logged at ERROR.
 - [ ] 5xx triggers Sentry alert.
 - [ ] User-facing errors are friendly + include request-id.
 
 ### Database / Migrations
+
 - [ ] `alembic upgrade head` runs cleanly on fresh DB.
 - [ ] Migration runs as part of Railway deploy command.
 - [ ] Failed migration halts deploy (rehearsed once).
@@ -3101,6 +3188,7 @@ make openapi
 - [ ] Indexes match spec §9.3.
 
 ### Railway Deployment
+
 - [ ] `api` and `web` services deploy from `main`.
 - [ ] All env vars from spec §22 set.
 - [ ] Custom domain + TLS active.
@@ -3108,12 +3196,14 @@ make openapi
 - [ ] Rollback procedure documented in `docs/runbooks/rollback.md` and rehearsed.
 
 ### Environment
+
 - [ ] `ENVIRONMENT=production`.
 - [ ] `DATABASE_URL` uses `+asyncpg`.
 - [ ] `FRONTEND_URLS` matches deployed origin.
 - [ ] No `.env` files in container images.
 
 ### Monitoring / Observability
+
 - [ ] JSON logs in Railway.
 - [ ] Every request has `request_id`.
 - [ ] No PII in any log line (verified by test).
@@ -3121,6 +3211,7 @@ make openapi
 - [ ] Synthetic ping on `/v1/health` (Railway or external).
 
 ### Final Sanity
+
 - [ ] Full smoke test on production: signup → create project → invite (use 2 accounts) → create task → mark done → see in dashboard.
 - [ ] README updated with live URL + demo credentials.
 - [ ] CHANGELOG entry for `v1.0.0`.
