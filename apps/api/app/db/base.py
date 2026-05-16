@@ -24,3 +24,8 @@ class SoftDeleteMixin:
     deleted_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True, default=None
     )
+
+
+# Import all models here so Alembic autogenerate can detect them
+from app.models.refresh_token import RefreshToken  # noqa: E402, F401
+from app.models.user import User  # noqa: E402, F401
