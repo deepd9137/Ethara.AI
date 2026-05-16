@@ -42,6 +42,13 @@ jobs:
       - name: Type check (mypy)
         run: uv run mypy .
 
+      - name: Migrate database
+        run: uv run alembic upgrade head
+        env:
+          DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/ttm
+          JWT_SECRET: ci-test-jwt-secret-not-used-in-production
+          JWT_REFRESH_SECRET: ci-test-jwt-refresh-secret-not-used-in-production
+
       - name: Tests
         run: uv run pytest
         env:
