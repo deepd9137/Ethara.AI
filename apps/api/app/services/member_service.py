@@ -7,7 +7,7 @@ from app.models.project import Project
 from app.models.project_member import ProjectMember, ProjectRole
 from app.models.user import User
 from app.repositories import project_members_repo, user_repo
-from app.services import activity_service
+from app.services import activity_service, task_service
 
 
 async def invite(
@@ -123,6 +123,12 @@ async def remove_member(
             status_code=409,
         )
 
+    await task_service.null_assignments_for_removed_member(
+        db,
+        project_id=project.id,
+        user_id=target_user_id,
+        actor_id=actor.id,
+    )
     await activity_service.log(
         db,
         actor_id=actor.id,
