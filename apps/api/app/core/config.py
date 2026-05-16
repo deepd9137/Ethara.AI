@@ -1,4 +1,4 @@
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -26,6 +26,13 @@ class Settings(BaseSettings):
     DOCS_ENABLED: bool = True
     SENTRY_DSN: str = ""
     REDIS_URL: str = ""
+
+    @field_validator("FRONTEND_URLS", mode="before")
+    @classmethod
+    def parse_frontend_urls(cls, v: object) -> object:
+        if isinstance(v, str):
+            return [url.strip() for url in v.split(",") if url.strip()]
+        return v
 
 
 settings = Settings()
