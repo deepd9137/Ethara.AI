@@ -1,0 +1,38 @@
+{
+  "name": "ethara-monorepo",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.1.2",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "prepare": "husky",
+    "dev": "pnpm -r --parallel --filter \"./apps/*\" dev",
+    "build": "pnpm -r --filter \"./apps/*\" build",
+    "lint": "pnpm -r --filter \"./apps/*\" lint",
+    "typecheck": "pnpm -r --filter \"./apps/*\" typecheck",
+    "test": "pnpm -r --filter \"./apps/*\" test",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,md,json,yml,yaml}\""
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.0.0",
+    "@commitlint/config-conventional": "^19.0.0",
+    "husky": "^9.0.0",
+    "lint-staged": "^15.0.0",
+    "prettier": "^3.2.0",
+    "prettier-plugin-tailwindcss": "^0.5.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,json,md,yml,yaml}": [
+      "prettier --write"
+    ],
+    "apps/web/**/*.{ts,tsx}": [
+      "pnpm --filter web exec eslint --fix"
+    ],
+    "apps/api/**/*.py": [
+      "apps/api/.venv/bin/ruff check --fix",
+      "apps/api/.venv/bin/black"
+    ]
+  }
+}
