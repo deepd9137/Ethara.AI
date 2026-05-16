@@ -1,6 +1,15 @@
-import { Card, CardContent, CardHeader, CardTitle, Skeleton } from "@/components/ui";
+import { Link } from "react-router-dom";
+import { Button, Card, CardContent, CardHeader, CardTitle, Skeleton } from "@/components/ui";
 import { useAuthStore } from "@/store/auth";
-import type { ActivityItem, MyTask, TaskPriority, TaskStatus } from "../api";
+import type {
+  ActivityItem,
+  MyTask,
+  MyTasksResponse,
+  RecentActivityResponse,
+  TaskPriority,
+  TaskStatus,
+} from "../api";
+import type { DashboardStats } from "../api";
 import { useDashboardStats, useMyTasks, useRecentActivity } from "../hooks";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -45,6 +54,31 @@ const PRIORITY_COLOURS: Record<TaskPriority, string> = {
   medium: "text-yellow-500",
   low: "text-muted",
 };
+
+// ── Getting started banner ─────────────────────────────────────────────────────
+
+function GettingStartedBanner() {
+  return (
+    <Card className="border-primary/30 bg-primary/5">
+      <CardContent className="flex flex-col items-center gap-4 py-10 text-center sm:flex-row sm:text-left">
+        <div className="bg-primary/10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-2xl">
+          🚀
+        </div>
+        <div className="flex-1">
+          <p className="text-body font-semibold">
+            You&apos;re all set up — create your first project
+          </p>
+          <p className="text-muted mt-1 text-sm">
+            Projects hold tasks and team members. Once you create one, your dashboard will fill in.
+          </p>
+        </div>
+        <Button asChild size="md">
+          <Link to="/projects">Create a project</Link>
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
 
 // ── Stat card ─────────────────────────────────────────────────────────────────
 
@@ -97,9 +131,12 @@ function MyTaskRow({ task }: { task: MyTask }) {
   );
 }
 
-function MyTasksList() {
-  const { data, isLoading } = useMyTasks();
+interface MyTasksListProps {
+  data: MyTasksResponse | undefined;
+  isLoading: boolean;
+}
 
+function MyTasksList({ data, isLoading }: MyTasksListProps) {
   if (isLoading) {
     return (
       <div className="space-y-3">
@@ -112,7 +149,16 @@ function MyTasksList() {
 
   if (!data?.items.length) {
     return (
-      <p className="text-muted py-6 text-center text-sm">No tasks assigned to you right now.</p>
+      <div className="py-6 text-center">
+        <p className="text-muted text-sm">No tasks assigned to you right now.</p>
+        <p className="text-muted mt-1 text-xs">
+          Ask a project admin to assign you tasks, or{" "}
+          <Link to="/projects" className="text-primary underline-offset-2 hover:underline">
+            browse your projects
+          </Link>
+          .
+        </p>
+      </div>
     );
   }
 
@@ -150,9 +196,12 @@ function ActivityRow({ item }: { item: ActivityItem }) {
   );
 }
 
-function RecentActivityFeed() {
-  const { data, isLoading } = useRecentActivity();
+interface RecentActivityFeedProps {
+  data: RecentActivityResponse | undefined;
+  isLoading: boolean;
+}
 
+function RecentActivityFeed({ data, isLoading }: RecentActivityFeedProps) {
   if (isLoading) {
     return (
       <div className="space-y-3">
@@ -185,9 +234,28 @@ function RecentActivityFeed() {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
+function isEmptyUser(
+  stats: DashboardStats | undefined,
+  activity: RecentActivityResponse | undefined,
+  loading: boolean,
+): boolean {
+  if (loading) return false;
+  return (
+    stats?.open === 0 &&
+    stats?.overdue === 0 &&
+    stats?.due_this_week === 0 &&
+    (activity?.total ?? 0) === 0
+  );
+}
+
 export function DashboardPage() {
   const user = useAuthStore((s) => s.user);
   const { data: stats, isLoading: statsLoading } = useDashboardStats();
+  const { data: tasks, isLoading: tasksLoading } = useMyTasks();
+  const { data: activity, isLoading: activityLoading } = useRecentActivity();
+
+  const allLoading = statsLoading || activityLoading;
+  const showCTA = isEmptyUser(stats, activity, allLoading);
 
   return (
     <div className="space-y-6 p-6">
@@ -197,6 +265,9 @@ export function DashboardPage() {
         </h1>
         <p className="text-muted mt-1 text-sm">Here&apos;s what needs your attention.</p>
       </div>
+
+      {/* CTA for empty users */}
+      {showCTA && <GettingStartedBanner />}
 
       {/* Stat cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -222,7 +293,7 @@ export function DashboardPage() {
             <CardTitle>My Tasks</CardTitle>
           </CardHeader>
           <CardContent>
-            <MyTasksList />
+            <MyTasksList data={tasks} isLoading={tasksLoading} />
           </CardContent>
         </Card>
 
@@ -231,7 +302,7 @@ export function DashboardPage() {
             <CardTitle>Recent Activity</CardTitle>
           </CardHeader>
           <CardContent>
-            <RecentActivityFeed />
+            <RecentActivityFeed data={activity} isLoading={activityLoading} />
           </CardContent>
         </Card>
       </div>
