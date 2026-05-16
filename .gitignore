@@ -1,0 +1,33 @@
+# Claude Code tool config — local only
+CLAUDE.md
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+*.egg-info/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+uv.lock
+
+# Node
+node_modules/
+dist/
+.pnpm-store/
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
