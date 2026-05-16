@@ -8,7 +8,7 @@ dependencies = [
   "sqlalchemy>=2.0",
   "asyncpg>=0.29",
   "alembic>=1.13",
-  "pydantic>=2.7",
+  "pydantic[email]>=2.7",
   "pydantic-settings>=2.3",
   "passlib[bcrypt]>=1.7",
   "python-jose[cryptography]>=3.3",
@@ -30,10 +30,13 @@ dev = [
   "mypy>=1.10",
   "types-passlib",
   "pip-audit>=2.7",
+  "types-python-jose>=3.5.0.20260408",
 ]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
 addopts = "-ra --strict-markers"
 testpaths = ["tests"]
 

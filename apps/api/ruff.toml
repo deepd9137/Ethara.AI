@@ -4,11 +4,12 @@ extend-exclude = ["alembic/versions"]
 
 [lint]
 select = ["E", "F", "I", "B", "UP", "N", "SIM", "RUF", "ASYNC", "S"]
-ignore = ["E501"]
+ignore = ["E501", "B008"]  # B008: FastAPI Depends() in defaults is intentional
 
 [lint.per-file-ignores]
-"tests/*" = ["S101", "S106"]
+"tests/*" = ["S101", "S106", "S105"]
 "alembic/env.py" = ["E402"]
+"app/schemas/*" = ["S105"]  # token_type = "bearer" is not a hardcoded secret
 
 [format]
 quote-style = "double"
