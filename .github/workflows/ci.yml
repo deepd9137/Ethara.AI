@@ -43,7 +43,7 @@ jobs:
         run: uv run mypy .
 
       - name: Tests
-        run: uv run pytest --cov=app --cov-report=xml
+        run: uv run pytest
         env:
           DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/ttm
 
@@ -91,7 +91,7 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-        working-directory: .
+        working-directory: ${{ github.workspace }}
 
       - name: Lint
         run: pnpm lint
