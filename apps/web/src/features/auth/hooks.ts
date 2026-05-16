@@ -2,11 +2,10 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { authApi } from "./api";
 import { useAuthStore } from "@/store/auth";
+import { setAccessToken } from "@/lib/auth/token";
 import { queryClient } from "@/lib/query/client";
 
 export function useMe() {
-  const setSession = useAuthStore((s) => s.setSession);
-
   return useQuery({
     queryKey: ["auth", "me"],
     queryFn: async () => {
@@ -15,12 +14,6 @@ export function useMe() {
     },
     retry: false,
     staleTime: Infinity,
-    select: (user) => {
-      // Ensure store stays in sync after hydration
-      const token = useAuthStore.getState().user ? undefined : null;
-      if (token !== undefined) setSession(user, token ?? "");
-      return user;
-    },
   });
 }
 
@@ -31,12 +24,14 @@ export function useLogin() {
   return useMutation({
     mutationFn: async (body: { email: string; password: string }) => {
       const { data: tokenData } = await authApi.login(body);
+      // Set token immediately so the /auth/me call below uses it
+      setAccessToken(tokenData.access_token);
       const { data: userData } = await authApi.me();
       return { token: tokenData.access_token, user: userData };
     },
     onSuccess({ token, user }) {
       setSession(user, token);
-      void queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
+      void queryClient.setQueryData(["auth", "me"], user);
       navigate("/dashboard");
     },
   });
@@ -53,7 +48,7 @@ export function useSignup() {
     },
     onSuccess(data) {
       setSession(data.user, data.access_token);
-      void queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
+      void queryClient.setQueryData(["auth", "me"], data.user);
       navigate("/dashboard");
     },
   });

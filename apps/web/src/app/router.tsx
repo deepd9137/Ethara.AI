@@ -2,6 +2,7 @@
 import { lazy, Suspense } from "react";
 import { createBrowserRouter, Outlet } from "react-router-dom";
 import { FullPageSkeleton } from "@/components/ui";
+import { ProtectedRoute } from "@/routes/ProtectedRoute";
 
 const LoginPage = lazy(() =>
   import("@/features/auth/pages/LoginPage").then((m) => ({ default: m.LoginPage })),
@@ -15,19 +16,19 @@ const DashboardPage = lazy(() =>
   })),
 );
 
-// Lazy-wrapped AppShell to keep initial bundle lean
 const AppShell = lazy(() =>
   import("@/components/layout/AppShell").then((m) => ({ default: m.AppShell })),
 );
 
-// Protected layout — AppShell wraps all authenticated pages
 function ProtectedLayout() {
   return (
-    <Suspense fallback={<FullPageSkeleton />}>
-      <AppShell>
-        <Outlet />
-      </AppShell>
-    </Suspense>
+    <ProtectedRoute>
+      <Suspense fallback={<FullPageSkeleton />}>
+        <AppShell>
+          <Outlet />
+        </AppShell>
+      </Suspense>
+    </ProtectedRoute>
   );
 }
 
