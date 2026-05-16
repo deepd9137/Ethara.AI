@@ -28,8 +28,8 @@ def create_app() -> FastAPI:
         default_response_class=ORJSONResponse,
     )
 
-    app.add_middleware(RequestIDMiddleware)
     app.add_middleware(LoggingMiddleware)
+    app.add_middleware(RequestIDMiddleware)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.FRONTEND_URLS,
