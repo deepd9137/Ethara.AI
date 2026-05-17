@@ -101,6 +101,9 @@ importers:
       "@vitest/coverage-v8":
         specifier: ^4.1.6
         version: 4.1.6(vitest@4.1.6)
+      axe-core:
+        specifier: ^4.11.4
+        version: 4.11.4
       eslint:
         specifier: ^10.3.0
         version: 10.4.0(jiti@2.7.0)
@@ -1661,6 +1664,13 @@ packages:
       {
         integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==,
       }
+
+  axe-core@4.11.4:
+    resolution:
+      {
+        integrity: sha512-KunSNx+TVpkAw/6ULfhnx+HWRecjqZGTOyquAoWHYLRSdK1tB5Ihce1ZW+UY3fj33bYAFWPu7W/GRSmmrCGuxA==,
+      }
+    engines: { node: ">=4" }
 
   axios@1.16.1:
     resolution:
@@ -5074,6 +5084,8 @@ snapshots:
       js-tokens: 10.0.0
 
   asynckit@0.4.0: {}
+
+  axe-core@4.11.4: {}
 
   axios@1.16.1:
     dependencies:

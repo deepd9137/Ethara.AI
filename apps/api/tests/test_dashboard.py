@@ -142,7 +142,9 @@ async def test_my_tasks_returns_only_assigned_to_me() -> None:
         )
         assert r_invite.status_code == 201, r_invite.text
         # Assign one task to me
-        await _create_task(c, token_owner, pid, assignee_id=user_data["user"]["id"])
+        me_user = user_data["user"]
+        assert isinstance(me_user, dict)
+        await _create_task(c, token_owner, pid, assignee_id=me_user["id"])
         # Unassigned task
         await _create_task(c, token_owner, pid)
 
