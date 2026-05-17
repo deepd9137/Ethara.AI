@@ -4,11 +4,17 @@ import { cn } from "@/lib/utils/cn";
 
 type ToastVariant = "success" | "error" | "info";
 
+export interface ToastAction {
+  label: string;
+  onClick: () => void;
+}
+
 export interface Toast {
   id: string;
   title: string;
   description?: string;
   variant: ToastVariant;
+  action?: ToastAction;
 }
 
 export interface ToastContextValue {
@@ -73,6 +79,15 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }
         <RadixToast.Description className="mt-1 text-xs opacity-80">
           {toast.description}
         </RadixToast.Description>
+      )}
+      {toast.action && (
+        <RadixToast.Action
+          altText={toast.action.label}
+          onClick={toast.action.onClick}
+          className="mt-2 rounded border border-current px-2 py-0.5 text-xs font-medium opacity-80 hover:opacity-100"
+        >
+          {toast.action.label}
+        </RadixToast.Action>
       )}
       <RadixToast.Close
         className="absolute right-2 top-2 rounded p-0.5 opacity-60 hover:opacity-100"
