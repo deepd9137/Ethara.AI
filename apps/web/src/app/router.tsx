@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { lazy, Suspense } from "react";
 import { createBrowserRouter, Outlet } from "react-router-dom";
-import { FullPageSkeleton } from "@/components/ui";
+import { ErrorBoundary, FullPageSkeleton } from "@/components/ui";
 import { ProtectedRoute } from "@/routes/ProtectedRoute";
 
 const LoginPage = lazy(() =>
@@ -15,6 +15,14 @@ const DashboardPage = lazy(() =>
     default: m.DashboardPage,
   })),
 );
+const ProjectsPage = lazy(() =>
+  import("@/features/projects/pages/ProjectsPage").then((m) => ({ default: m.ProjectsPage })),
+);
+const ProjectDetailPage = lazy(() =>
+  import("@/features/projects/pages/ProjectDetailPage").then((m) => ({
+    default: m.ProjectDetailPage,
+  })),
+);
 
 const AppShell = lazy(() =>
   import("@/components/layout/AppShell").then((m) => ({ default: m.AppShell })),
@@ -25,7 +33,9 @@ function ProtectedLayout() {
     <ProtectedRoute>
       <Suspense fallback={<FullPageSkeleton />}>
         <AppShell>
-          <Outlet />
+          <ErrorBoundary>
+            <Outlet />
+          </ErrorBoundary>
         </AppShell>
       </Suspense>
     </ProtectedRoute>
@@ -65,6 +75,22 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<FullPageSkeleton />}>
             <DashboardPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/projects",
+        element: (
+          <Suspense fallback={<FullPageSkeleton />}>
+            <ProjectsPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/projects/:projectId",
+        element: (
+          <Suspense fallback={<FullPageSkeleton />}>
+            <ProjectDetailPage />
           </Suspense>
         ),
       },

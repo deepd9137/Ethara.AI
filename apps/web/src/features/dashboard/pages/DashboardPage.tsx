@@ -214,7 +214,16 @@ function RecentActivityFeed({ data, isLoading }: RecentActivityFeedProps) {
 
   if (!data?.items.length) {
     return (
-      <p className="text-muted py-6 text-center text-sm">No recent activity in your projects.</p>
+      <div className="py-6 text-center">
+        <p className="text-muted text-sm">No recent activity yet.</p>
+        <p className="text-muted mt-1 text-xs">
+          Activity appears here once you{" "}
+          <Link to="/projects" className="text-primary underline-offset-2 hover:underline">
+            create a project
+          </Link>{" "}
+          and start working.
+        </p>
+      </div>
     );
   }
 
