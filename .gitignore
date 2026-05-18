@@ -13,6 +13,12 @@ __pycache__/
 .coverage
 htmlcov/
 coverage.xml
+coverage/
+
+# Playwright
+test-results/
+playwright-report/
+.playwright/
 
 # Node
 node_modules/
