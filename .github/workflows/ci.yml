@@ -102,8 +102,8 @@ jobs:
       - name: Type check
         run: pnpm --filter web typecheck
 
-      - name: Test (includes axe-core a11y checks)
-        run: pnpm --filter web test
+      - name: Test (with coverage gate, includes axe-core a11y checks)
+        run: pnpm --filter web coverage
 
       - name: Build
         run: pnpm --filter web build
