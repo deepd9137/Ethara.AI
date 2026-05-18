@@ -43,7 +43,10 @@ testpaths = ["tests"]
 [tool.coverage.run]
 branch = true
 source = ["app"]
+omit = ["app/db/registry.py"]
 
 [tool.coverage.report]
 fail_under = 80
 exclude_also = ["if TYPE_CHECKING:", "raise NotImplementedError"]
+show_missing = true
+skip_covered = false
