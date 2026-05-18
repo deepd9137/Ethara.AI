@@ -49,8 +49,8 @@ jobs:
           JWT_SECRET: ci-test-jwt-secret-not-used-in-production
           JWT_REFRESH_SECRET: ci-test-jwt-refresh-secret-not-used-in-production
 
-      - name: Tests
-        run: uv run pytest
+      - name: Tests (with coverage gate)
+        run: uv run pytest --cov=app --cov-report=term --cov-report=xml
         env:
           DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/ttm
           JWT_SECRET: ci-test-jwt-secret-not-used-in-production
