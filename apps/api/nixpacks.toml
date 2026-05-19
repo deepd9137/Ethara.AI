@@ -1,0 +1,18 @@
+# Pin Python + install uv so Railway's NIXPACKS provider can resolve `uv sync`.
+# Without this, NIXPACKS detects FastAPI but defaults to pip; uv must be on PATH
+# at build time for the lockfile-based install in railway.toml to succeed.
+
+providers = ["python"]
+
+[phases.setup]
+nixPkgs = ["python312", "gcc"]
+aptPkgs = ["curl"]
+
+[phases.install]
+cmds = [
+  "curl -LsSf https://astral.sh/uv/install.sh | sh",
+  "export PATH=\"$HOME/.local/bin:$PATH\" && uv sync --frozen --no-dev",
+]
+
+[start]
+cmd = "$HOME/.local/bin/uv run alembic upgrade head && $HOME/.local/bin/uv run uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 2"
