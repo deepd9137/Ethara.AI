@@ -33,8 +33,8 @@ migrate: ## Apply all pending migrations
 migration: ## Create migration: make migration name="add users table"
 	cd apps/api && .venv/bin/alembic revision --autogenerate -m "$(name)"
 
-seed: ## Seed demo data
-	cd apps/api && .venv/bin/python scripts/seed.py
+seed: ## Seed demo data (creates demo@ethara.example / DemoPass123!)
+	cd apps/api && .venv/bin/python -m app.scripts.seed
 
 test: ## Run all tests
 	cd apps/api && .venv/bin/pytest
