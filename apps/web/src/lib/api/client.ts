@@ -37,7 +37,12 @@ interface RetryableConfig extends InternalAxiosRequestConfig {
 
 api.interceptors.response.use(undefined, async (err) => {
   const config = err.config as RetryableConfig | undefined;
-  if (err.response?.status === 401 && config && !config._retry) {
+  // Never run the refresh-and-retry flow for /auth/* calls. In particular, a
+  // 401 from /auth/refresh must not trigger another refresh: the second call
+  // awaits the same in-flight promise that is itself blocked on this response,
+  // deadlocking every queued request (perpetual loading skeletons).
+  const isAuthCall = config?.url?.includes("/auth/");
+  if (err.response?.status === 401 && config && !config._retry && !isAuthCall) {
     config._retry = true;
     const newToken = await refreshAccessToken();
     if (!newToken) {
