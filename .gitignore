@@ -1,5 +1,6 @@
-# Claude Code tool config — local only
+# Editor / tool config — local only
 CLAUDE.md
+.claude/
 
 # Python
 __pycache__/
