@@ -11,6 +11,18 @@ WORKDIR /app
 RUN npm install -g pnpm@11.1.2
 COPY . .
 RUN pnpm install --frozen-lockfile
+
+# Vite inlines VITE_* at build time. Docker RUN steps don't see Railway's
+# service variables unless they're declared as build args — Railway passes
+# service variables as --build-arg for Dockerfile builds.
+ARG VITE_API_BASE_URL
+ARG VITE_ENVIRONMENT
+ARG VITE_COMMIT_SHA
+ARG VITE_SENTRY_DSN
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL \
+    VITE_ENVIRONMENT=$VITE_ENVIRONMENT \
+    VITE_COMMIT_SHA=$VITE_COMMIT_SHA \
+    VITE_SENTRY_DSN=$VITE_SENTRY_DSN
 RUN pnpm --filter web build
 
 FROM node:22-slim AS runtime
