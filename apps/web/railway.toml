@@ -1,9 +1,8 @@
 [build]
-builder = "NIXPACKS"
-buildCommand = "corepack enable && corepack prepare pnpm@11 --activate && pnpm install --frozen-lockfile && pnpm --filter web build"
+builder = "DOCKERFILE"
+dockerfilePath = "apps/web/Dockerfile"
 
 [deploy]
-startCommand = "pnpm dlx serve@14 -s apps/web/dist -l $PORT"
 healthcheckPath = "/"
 healthcheckTimeout = 10
 restartPolicyType = "ON_FAILURE"
