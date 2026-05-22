@@ -4,13 +4,13 @@ A production-grade full-stack team task management application built with FastAP
 
 ## Live demo
 
-| Surface | URL                                  |
-| ------- | ------------------------------------ |
-| Web app | https://app.ethara.example           |
-| API     | https://api.ethara.example/v1        |
-| Health  | https://api.ethara.example/v1/health |
+| Surface | URL                                                  |
+| ------- | ---------------------------------------------------- |
+| Web app | https://web-production-f0be4.up.railway.app          |
+| API     | https://api-production-a3eb.up.railway.app/v1        |
+| Health  | https://api-production-a3eb.up.railway.app/v1/health |
 
-> Replace the placeholders above with the Railway domains issued after the first deploy. Update `FRONTEND_URLS` (api) and `VITE_API_BASE_URL` (web) to match.
+> Deployed on Railway; pushes to `main` redeploy both services automatically.
 
 **Demo credentials** — seeded by `apps/api/app/scripts/seed.py`:
 
