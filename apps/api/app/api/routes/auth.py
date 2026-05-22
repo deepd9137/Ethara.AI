@@ -1,7 +1,10 @@
+from typing import Literal
+
 from fastapi import APIRouter, Depends, Request, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps.auth import get_current_user
+from app.core.config import settings
 from app.core.limiter import limiter
 from app.db.session import get_db
 from app.middleware.exceptions import BusinessError
@@ -20,12 +23,18 @@ _COOKIE_MAX_AGE = 14 * 24 * 60 * 60  # 14 days
 
 
 def _set_refresh_cookie(response: Response, raw: str) -> None:
+    # In production the api and web run on separate domains, so the refresh
+    # request is cross-site and the cookie must be SameSite=None to be sent.
+    # Locally the Vite proxy keeps everything same-origin, so Strict holds.
+    samesite: Literal["none", "strict"] = (
+        "none" if settings.ENVIRONMENT == "production" else "strict"
+    )
     response.set_cookie(
         key=_COOKIE_NAME,
         value=raw,
         httponly=True,
         secure=True,
-        samesite="strict",
+        samesite=samesite,
         path="/v1/auth",
         max_age=_COOKIE_MAX_AGE,
     )
